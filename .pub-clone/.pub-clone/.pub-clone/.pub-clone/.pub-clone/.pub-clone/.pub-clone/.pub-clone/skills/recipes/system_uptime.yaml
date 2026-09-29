@@ -1,0 +1,12 @@
+name: system_uptime
+description: czas działania systemu i średnie obciążenie (uptime)
+order: 15
+patterns:
+  - 'jak dlugo (?:dziala|pracuje) (?:system|komputer|pi)'
+  - 'czas dzialania systemu'
+  - 'od kiedy dziala system'
+  - 'uptime'
+command: 'uptime -p; uptime'
+confirm: never
+timeout: 15
+done: 'Czas działania systemu pokazany powyżej.'

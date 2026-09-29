@@ -1,0 +1,11 @@
+name: running_services
+description: lista działających usług systemd
+order: 25
+patterns:
+  - 'dzialajace (?:uslugi|serwisy)'
+  - 'jakie uslugi (?:dzialaja|sa uruchomione)'
+  - 'lista uslug'
+command: 'systemctl list-units --type=service --state=running --no-pager'
+confirm: never
+timeout: 30
+done: 'Działające usługi wypisane powyżej.'

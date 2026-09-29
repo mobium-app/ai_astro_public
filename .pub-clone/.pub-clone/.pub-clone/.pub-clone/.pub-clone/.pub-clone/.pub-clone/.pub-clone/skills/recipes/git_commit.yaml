@@ -1,0 +1,14 @@
+name: git_commit
+description: zatwierdza zmiany w repozytorium git (add + commit)
+order: 75
+patterns:
+  - 'git commit\s*(?:-m\s+)?(?P<msg>.+)'
+  - 'zatwierdz (?:wszystkie )?zmiany(?:\s+(?:komentarzem|wiadomoscia|opisem)\s+(?P<msg>.+))?'
+commands:
+  - command: 'git -C {{path|@project}} add -A'
+    say: 'Dodaję zmiany.'
+  - command: 'git -C {{path|@project}} commit -m {{msg|ASTRO: zapis zmian}}'
+    say: 'Zatwierdzam zmiany.'
+confirm: always
+timeout: 120
+done: 'Zmiany zatwierdzone w repozytorium.'

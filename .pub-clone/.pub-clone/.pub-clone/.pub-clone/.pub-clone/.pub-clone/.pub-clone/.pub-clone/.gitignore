@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.db
+runtime/
+logs/
+datasets/
+models/
+knowledge/local/
+knowledge/web/
+knowledge/hnsw/
+*.env
+!config/machines.env
+*.log
+# Backupy datasetów (duże, lokalne) — nie trzymamy w repozytorium (E4, 2026-09-26).
+datasets_backup*/
