@@ -1,0 +1,40 @@
+name: Bug report
+description: Coś nie działa — zgłoś błąd
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Dziękujemy za zgłoszenie! Opisz problem tak dokładnie, jak się da."
+  - type: textarea
+    id: what
+    attributes:
+      label: Co się stało?
+      description: "Co oczekiwałeś/aś, a co się wydarzyło?"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Kroki reprodukcji
+      placeholder: |
+        1. Uruchamiam ...
+        2. Wpisuję/mówię ...
+        3. Otrzymuję ...
+    validations:
+      required: true
+  - type: dropdown
+    id: env
+    attributes:
+      label: Środowisko
+      options:
+        - Raspberry Pi 5 + Hailo
+        - Linux x86 (bez NPU)
+        - Inne / nie wiem
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logi / wyjście
+      description: "Wklej istotny fragment wyjścia. Uwaga: NIE wklejaj kluczy API ani danych osobowych."
