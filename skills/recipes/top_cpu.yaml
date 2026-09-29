@@ -1,0 +1,11 @@
+name: top_cpu
+description: procesy zużywające najwięcej procesora (CPU)
+order: 51
+patterns:
+  - 'procesy (?:z )?(?:najwiekszym )?(?:uzyciem )?(?:procesora|cpu)'
+  - 'co (?:zjada|obciaza) (?:procesor|cpu)'
+  - 'obciazenie procesora'
+command: 'ps aux --sort=-%cpu | head -n 10'
+confirm: never
+timeout: 30
+done: 'Procesy z największym zużyciem CPU wypisane powyżej.'
