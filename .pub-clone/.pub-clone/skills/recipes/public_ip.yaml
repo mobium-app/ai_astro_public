@@ -1,0 +1,12 @@
+name: public_ip
+description: publiczny adres IP (z internetu, z fallbackiem offline)
+order: 46
+patterns:
+  - 'publiczne ip'
+  - 'moj publiczny adres'
+  - 'zewnetrzne ip'
+  - 'adres ip w internecie'
+command: "curl -fsS --max-time 6 https://ifconfig.me || curl -fsS --max-time 6 https://api.ipify.org"
+confirm: never
+timeout: 20
+done: 'Publiczny adres IP pokazany powyżej.'

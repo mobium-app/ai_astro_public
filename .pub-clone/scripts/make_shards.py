@@ -12,7 +12,7 @@ import json
 import os
 import random
 
-A = "$HOME/astro"
+A = "/home/user/astro"
 src = os.path.join(A, "datasets")
 out = os.path.join(A, "runtime", "shards")
 os.makedirs(out, exist_ok=True)
