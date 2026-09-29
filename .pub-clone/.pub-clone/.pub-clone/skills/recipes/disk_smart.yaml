@@ -1,0 +1,12 @@
+name: disk_smart
+description: stan dysku i partycji (lsblk) oraz wersja systemu
+order: 19
+patterns:
+  - 'lista dyskow'
+  - 'jakie (?:sa )?dyski'
+  - 'partycje'
+  - 'lsblk'
+command: 'lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,MODEL 2>/dev/null'
+confirm: never
+timeout: 20
+done: 'Lista dysków i partycji pokazana powyżej.'
