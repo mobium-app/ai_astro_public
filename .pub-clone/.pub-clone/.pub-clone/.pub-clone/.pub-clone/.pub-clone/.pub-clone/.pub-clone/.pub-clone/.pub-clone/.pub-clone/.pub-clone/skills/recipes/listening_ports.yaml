@@ -1,0 +1,12 @@
+name: listening_ports
+description: nasłuchujące porty TCP (ss -tlnp)
+order: 45
+patterns:
+  - 'nasluchujace porty'
+  - 'otwarte porty'
+  - 'jakie porty (?:sa )?otwarte'
+  - 'ss -tlnp'
+command: 'ss -tlnp'
+confirm: never
+timeout: 30
+done: 'Nasłuchujące porty wypisane powyżej.'

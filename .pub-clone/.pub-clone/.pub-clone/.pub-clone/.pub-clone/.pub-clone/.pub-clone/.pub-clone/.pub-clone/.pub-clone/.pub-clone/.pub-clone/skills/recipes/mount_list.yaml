@@ -1,0 +1,12 @@
+name: mount_list
+description: lista zamontowanych systemów plików i urządzeń (findmnt)
+order: 30
+patterns:
+  - '(?:pokaz|wyswietl|lista|sprawdz)?\s*zamontowane\s+(?:dyski|partycje|systemy plikow|urzadzenia|napedy|nosniki)'
+  - 'co jest zamontowane'
+  - 'punkty montowania|zamontowane systemy plikow'
+  - 'lista montowan|lista montowa[nń]|pokaz montowania|montowania'
+command: 'findmnt --real'
+confirm: never
+timeout: 60
+done: 'Zamontowane systemy plików wypisane powyżej.'
