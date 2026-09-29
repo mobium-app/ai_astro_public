@@ -1,0 +1,10 @@
+name: config_backup
+description: kopia zapasowa pliku konfiguracyjnego ze znacznikiem czasu
+order: 70
+patterns:
+  - '(?:zrob\s+|wykonaj\s+)?(?:kopi[ae]|kopiuj|zabezpiecz|backup)(?:\s+zapasow[ae])?(?:\s+(?:pliku?|konfiguracji|pliku konfiguracyjnego))?\s+(?P<path>[~/][\w./+-]+)'
+  - 'backup pliku\s+(?P<path>[~/][\w./+-]+)'
+command: 'cp -a {{path}} {{path}}.bak.$(date +%Y%m%d-%H%M%S)'
+confirm: always
+timeout: 60
+done: 'Kopia zapasowa pliku {{path}} utworzona ze znacznikiem czasu.'

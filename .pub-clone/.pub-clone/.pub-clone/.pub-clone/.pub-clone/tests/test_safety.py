@@ -1,5 +1,6 @@
 """Testy bezpieczeństwa (port + rozszerzenie)."""
 
+import os
 import unittest
 
 from astro import safety
@@ -65,7 +66,7 @@ class TestCommands(unittest.TestCase):
 class TestSecrets(unittest.TestCase):
     def test_sensitive_path(self):
         self.assertTrue(safety.is_sensitive_path("~/.ssh/id_rsa"))
-        self.assertTrue(safety.is_sensitive_path("$HOME/.git-credentials"))
+        self.assertTrue(safety.is_sensitive_path(os.path.expanduser("~/.git-credentials")))
         self.assertFalse(safety.is_sensitive_path("/tmp/plik.txt"))
 
     def test_private_url(self):

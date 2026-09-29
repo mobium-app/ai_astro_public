@@ -13,7 +13,7 @@ class TestSpeakable(unittest.TestCase):
         self.assertIn("gigabajt", audio.speakable("10 GB"))
 
     def test_no_symbol_names(self):
-        self.assertNotIn("ukośnik", audio.speakable("$HOME"))
+        self.assertNotIn("ukośnik", audio.speakable("/home/user"))
         self.assertNotIn("małpa", audio.speakable("jan@example.com"))
         self.assertNotIn("kratka", audio.speakable("#hashtag"))
         self.assertNotIn("daszek", audio.speakable("2^3"))
