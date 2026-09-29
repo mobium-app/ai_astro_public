@@ -1,0 +1,13 @@
+name: dir_size
+description: rozmiar katalogu lub pliku (du -sh)
+order: 20
+patterns:
+  - 'ile (?:miejsca )?zajmuje (?:katalog |folder |plik )?(?P<path>[~/][\w./+-]+)'
+  - 'rozmiar (?:katalogu |folderu |pliku )?(?P<path>[~/][\w./+-]+)'
+  - 'zajetosc (?:katalogu |folderu |pliku )?(?P<path>[~/][\w./+-]+)'
+  - '(?:ile )?wazy (?:katalog |folder |plik )?(?P<path>[~/][\w./+-]+)'
+  - 'rozmiar (?:katalogu domowego|domu|katalogu)'
+command: 'du -sh {{path|~}}'
+confirm: never
+timeout: 300
+done: 'Rozmiar policzony powyżej.'

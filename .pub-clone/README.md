@@ -5,11 +5,14 @@
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue)](requirements.txt)
 [![Tests](https://img.shields.io/badge/tests-1001%20passed-green)]()
 [![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%205%20%7C%20Linux-AA0000)]()
+[![Website](https://img.shields.io/badge/site-netrunner.edu.pl-0e8a16)](https://netrunner.edu.pl/projekt-astro)
 
 **ASTRO** to samodzielny agent głosowy typu open-core: słyszy, mówi, widzi,
 wykonuje komendy na swoim urządzeniu, uczy się w trakcie pracy i trenuje własne
 modele (LoRA). Zbudowany od zera jako czysty, testowalny SDK — bez chmury
 obowiązkowej (offline-first, NPU-first).
+
+> 🌐 **Projekt ASTRO — strona komercyjna: [netrunner.edu.pl/projekt-astro](https://netrunner.edu.pl/projekt-astro)**
 
 > To jest publiczne lustro projektu. Repozytorium źródłowe (prywatne) zawiera
 > dane osobiste i logi, dlatego publiczny snapshot jest **sanityzowany**: IP,
@@ -88,6 +91,9 @@ bez regresji względem baseline.
 
 ## Licencja
 MIT — patrz `LICENSE`.
+
+## Projekt komercyjny
+ASTRO to także komercyjny projekt — strona projektu: **[netrunner.edu.pl/projekt-astro](https://netrunner.edu.pl/projekt-astro)**.
 
 ## Status
 Snapshot `public-YYYY-MM-DD` (wersja prywatna v0.122+). Publiczne repo jest

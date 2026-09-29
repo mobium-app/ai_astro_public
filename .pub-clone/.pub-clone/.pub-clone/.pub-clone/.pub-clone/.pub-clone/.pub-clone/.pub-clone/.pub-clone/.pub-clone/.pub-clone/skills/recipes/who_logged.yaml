@@ -1,0 +1,12 @@
+name: who_logged
+description: kto jest zalogowany i ostatnie logowania (who/last)
+order: 38
+patterns:
+  - 'kto jest (?:teraz )?zalogowany'
+  - 'zalogowani uzytkownicy'
+  - 'ostatnie logowania'
+  - 'kto sie logowal'
+command: 'who; echo "--- aktywne sesje ---"; w -h 2>/dev/null | head -n 10; echo "--- ostatnie logowania ---"; journalctl -t systemd-logind -n 10 --no-pager 2>/dev/null || true'
+confirm: never
+timeout: 20
+done: 'Zalogowani użytkownicy i ostatnie logowania pokazani powyżej.'
