@@ -1,5 +1,11 @@
 # ASTRO — self-hosted, self-improving voice AI agent
 
+[![CI](https://github.com/mobium-app/ai_astro_public/actions/workflows/ci.yml/badge.svg)](https://github.com/mobium-app/ai_astro_public/actions)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue)](requirements.txt)
+[![Tests](https://img.shields.io/badge/tests-1001%20passed-green)]()
+[![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%205%20%7C%20Linux-AA0000)]()
+
 **ASTRO** to samodzielny agent głosowy typu open-core: słyszy, mówi, widzi,
 wykonuje komendy na swoim urządzeniu, uczy się w trakcie pracy i trenuje własne
 modele (LoRA). Zbudowany od zera jako czysty, testowalny SDK — bez chmury
@@ -8,6 +14,12 @@ obowiązkowej (offline-first, NPU-first).
 > To jest publiczne lustro projektu. Repozytorium źródłowe (prywatne) zawiera
 > dane osobiste i logi, dlatego publiczny snapshot jest **sanityzowany**: IP,
 > ścieżki i sekrety zastąpiono placeholderami. Kod jest w 100% realny i testowalny.
+
+## Demo
+
+![Demo terminala ASTRO](assets/astro_demo.gif)
+
+🎧 **Próbka głosu ASTRO** (TTS Piper, profil „dziewczynka"): [posłuchaj](assets/astro_voice_sample.wav)
 
 ## Po co istnieje
 - **Prywatny asystent w domu**: budzi się na „Hej Astro", rozumie polską mowę

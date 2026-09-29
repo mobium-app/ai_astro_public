@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Bezpieczeństwo (luki)
+    url: https://github.com/mobium-app/ai_astro_public/security
+    about: Zgłaszaj luki przez Security Advisory — nie w publicznych issue.
