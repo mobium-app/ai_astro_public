@@ -1,0 +1,123 @@
+# Pierwsza pomoc przedmedyczna i popularne przypadlosci - baza offline Ateny.
+#
+# Format:  klucz_regex1 ; klucz_regex2 ; ... => odpowiedz
+#   - klucze to fragmenty wyrazen regularnych (bez ';' i bez '=>'),
+#     dopasowywane do zapytania w formie znormalizowanej (male litery, bez polskich znakow);
+#     dlatego pisz klucze bez diakrytykow, np. "goraczk", "zawal", "oparz".
+#   - wygrywa dopasowanie o NAJWIEKSZEJ dlugosci (najbardziej szczegolowe).
+#   - odpowiedzi sa czytane na glos: krotkie zdania, bez list, bez markdown.
+#   - ZASADA BEZPIECZENSTWA: stany zagrozenia zycia ZAWIERAJA "112"; pozostale koncza sie
+#     przypomnieniem, ze to nie diagnoza (dokleja je first_aid_reply()).
+#   - Ten plik jest zrodlem offline (dziala bez internetu) - aktualizuj ostroznie, po jednym
+#     temacie na linie. Nie usuwaj wpisow o 112.
+
+# ==========================================================================
+# STANY ZAGROZENIA ZYCIA / RESUSCYTACJA
+# ==========================================================================
+pierwsz\w* pomoc|pomoc przedmedyczn|pomoc przedlekarsk|ratowanie zycia => Najpierw zadbaj o wlasne bezpieczenstwo, potem sprawdz przytomnosc i oddech. Dzwoń pod 112 lub wyznacz konkretną osobę do wezwania pomocy. Jeśli poszkodowany nie oddycha, uciskaj środek klatki piersiowej. Nie podawaj nic do picia.
+reanim\w*|resuscyt\w*|\brko\b|zatrzymanie krazenia|zatrzymanie akcji serca|nie oddycha|brak oddechu => Dzwoń pod 112 i włącz tryb głośnomówiący. Ułóż poszkodowanego na plecach na twardym podłożu. Uciskaj środek klatki piersiowej na głębokość 5-6 cm, 100-120 razy na minutę, bez przerw. Jeśli potrafisz, po 30 uciśnięciach wykonaj 2 oddechy ratunkowe. Użyj AED, jeśli jest dostępne.
+nieprzytomn|utrata przytomnosci|pozycja boczna => Jeśli poszkodowany oddycha, ale jest nieprzytomny, ułóż go w pozycji bocznej bezpiecznej i cały czas kontroluj oddech. Dzwoń pod 112. Gdy oddech ustanie, rozpocznij resuscytację.
+omdl\w*|zemdla\w* => Przy omdleniu ułóż poszkodowanego na plecach i unieś nogi powyżej poziomu serca, zapewnij dopływ powietrza. Jeśli po minucie nie odzyskuje przytomności, dzwoń pod 112. Nie podawaj nic doustnie, dopóki nie jest w pełni przytomny.
+zadlaw\w*|zakrztus\w*|dusi\w*|duszen\w*|cialo obce w drogach => Zachęć do kaszlu. Jeśli nie może oddychać ani mówić, wykonaj do 5 uderzeń między łopatki, potem do 5 uciśnięć nadbrzusza, naprzemiennie. Gdy straci przytomność, dzwoń pod 112 i rozpocznij resuscytację.
+zadlaw\w* (niemowl|dzieck)|niemowl\w* (sie )?dusi|zakrztus\w* (niemowl|dzieck) => U niemowlęcia ułóż je brzuchem na przedramieniu, głową w dół, wykonaj 5 uderzeń w plecy, potem 5 uciśnięć dolnej części mostka. Dzwoń pod 112, jeśli nie ustąpi.
+duszno\w*|duszn\w*|nie moze oddychac|trudno oddychac|ciezko oddychac => Duszność może być stanem zagrożenia życia - dzwoń pod 112, zwłaszcza przy sinieniu warg, bólu w klatce lub trudności z mówieniem. Posadź poszkodowanego, rozluźnij ubranie, nie zostawiaj samego.
+krwotok\w*|krwaw\w*|krwawi\w*|krew z ran\w* => Założ jałowy lub czysty opatrunek i mocno uciskaj miejsce krwawienia, unieś kończynę. Nie usuwaj wbitych przedmiotów. Przy masywnym krwawieniu z kończyny możesz użyć opaski zaciskowej powyżej rany i zapisać godzinę. Dzwoń pod 112.
+oparz\w*|poparz\w*|parzy\b => Chłodź oparzenie letnią wodą około 15-20 stopni przez 15-20 minut, zdejmij biżuterię i luźne ubranie. Nie stosuj lodu, masła ani pasty i nie przekłuwaj pęcherzy. Przy rozległym oparzeniu, oparzeniu twarzy, rąk lub dróg oddechowych dzwoń pod 112.
+oparzenie chemiczn|kwas na skor|zasada na skor|chemikalia na skor => Zdejmij skażone ubranie, uważając na siebie, i obficie spłukuj skórę wodą co najmniej 20 minut. Nie neutralizuj substancji. Dzwoń pod 112 i podaj nazwę substancji.
+zawal\w*|bol\w* (mnie )?w klatce|bol w klatce|bol zamostkowy|ucisk w klatce|klatce piersiowej => Podejrzenie zawału - dzwoń pod 112. Posadź poszkodowanego w pozycji półsiedzącej, rozluźnij ubranie i uspokój. Nie podawaj nic doustnie ani żadnych leków, chyba że dyspozytor zaleci. Bądź gotów do resuscytacji.
+udar mozgu|objawy udaru|opadniety\w*|niedowlad\w*|zaburzenia mowy|belkot\w* => Podejrzenie udaru - dzwoń pod 112 i zapisz godzinę wystąpienia objawów. Sprawdź twarz, ramiona i mowę. Ułóż poszkodowanego z lekko uniesioną głową, nie podawaj nic doustnie.
+padaczk\w*|drgawk\w* => Podczas ataku padaczki usuń niebezpieczne przedmioty i podłóż coś miękkiego pod głowę; nie przytrzymuj i nie wkładaj nic do ust. Po ataku ułóż w pozycji bocznej. Dzwoń pod 112, jeśli atak trwa ponad 5 minut, powtarza się lub to pierwszy atak.
+anafilak\w*|wstrzas uczuleniowy|obrzek twarzy|uczulenie.*duszno|pokrzywka.*duszno => Wstrząs anafilaktyczny - dzwoń pod 112. Jeśli poszkodowany ma autoiniektor adrenaliny, pomóż wstrzyknąć go w udo. Ułóż na plecach z uniesionymi nogami, a przy duszności posadź. Nie zostawiaj samego.
+zlam\w*|pekni\w* kosci => Unieruchom kończynę w zastanej pozycji, nie nastawiaj i nie prostuj na siłę. Przyłóż zimny okład przez tkaninę. Dzwoń pod 112 przy złamaniu otwartym, zniekształceniu lub braku czucia.
+zwichn\w*|skrec\w*|skrecon\w* => Unieruchom staw, przyłóż zimny okład na 15-20 minut przez tkaninę i unieś kończynę. Nie nastawiaj stawu samodzielnie. Przy dużym bólu i obrzęku zgłoś się do lekarza.
+krwaw\w* z nosa|krew z nosa|krwotok z nosa => Usiądź, pochyl głowę do przodu i uciskaj skrzydełka nosa przez 10 minut. Nie odchylaj głowy do tyłu. Jeśli krwawienie nie ustaje po 20 minutach lub wystąpiło po urazie, dzwoń pod 112.
+uton\w*|tonie\b|topi sie|wyciagn\w* z wody => Wydobądź poszkodowanego bezpiecznie i sprawdź oddech. Jeśli nie oddycha, dzwoń pod 112 i rozpocznij 5 oddechów ratunkowych, potem resuscytację. Nie zostawiaj samego.
+zatru\w*|otru\w*|trucizn\w*|wypil\w* (lek|plyn|chem) => Zatrucie - dzwoń pod 112 lub jedź na ostry dyżur i nie wywołuj wymiotów. Zachowaj opakowanie lub resztki substancji, nie podawaj jedzenia ani płynów. Jeśli poszkodowany jest nieprzytomny, ułóż go w pozycji bocznej.
+tlenek wegla|czad\w*|zaczadz\w* => Zatrucie czadem - natychmiast wynieś poszkodowanego na świeże powietrze, nie włączaj światła ani urządzeń. Dzwoń pod 112. Jeśli nie oddycha, po wyniesieniu rozpocznij resuscytację.
+zmij\w*|zmii|ukas\w*[^.!?]{0,15}(weza|zmij|zmii)|wez ukasil|ukasila zmija => Ukąszenie żmii - unieruchom kończynę i ułóż ją poniżej poziomu serca, zdejmij biżuterię. Nie naciskaj, nie wysysaj i nie nacinaj rany. Dzwoń pod 112 i opisz wygląd węża.
+porazen\w* pradem|pora\w* prad|elektryczn\w* => Najpierw odłącz źródło prądu, nie dotykaj poszkodowanego. Dzwoń pod 112. Jeśli nie oddycha, po upewnieniu się, że jest bezpiecznie, rozpocznij resuscytację.
+wstrzas\w* => Wstrząs - dzwoń pod 112. Ułóż poszkodowanego na plecach, unieś nogi, okryj go i nie podawaj nic doustnie. Kontroluj oddech i przytomność.
+hipotermi\w*|wychlodz\w*|odmroz\w*|przemarzn\w* => Przenieś poszkodowanego do ciepłego miejsca, zdejmij mokre ubranie, okryj kocem i ogrzewaj stopniowo. Nie pocieraj skóry. Dzwoń pod 112, jeśli jest osłabiony lub nieprzytomny.
+udar ciepln\w*|przegrz\w*|przeciazenie ciepln\w* => Przenieś do chłodu, zdejmij zbędne ubranie, chłodź wodą i wachluj. Dzwoń pod 112, jeśli doszło do utraty przytomności lub zaburzeń świadomości.
+cialo obce w oku|cos w oku|piasek w oku => Nie trzeć oka. Przemyj je przegotowaną wodą lub solą fizjologiczną. Nie usuwaj wbitego przedmiotu. Zasłoń oko i zgłoś się do okulisty albo dzwoń pod 112.
+uraz\w* glow\w*|wstrzas\w* mozgu|uderz\w* w glow\w*|upad\w* na glow\w* => Chłodź miejsce urazu przez 20 minut i obserwuj. Dzwoń pod 112 przy utracie przytomności, wymiotach, splątaniu, narastającym bólu głowy lub nierównych źrenicach.
+amputacj\w*|odciet\w* (palec|rece|noge)|odcieta => Uciskaj kikut i unieś kończynę. Odcinek owiń jałowo, wtórnie w worek i włóż do wody z lodem - przekaż ratownikom. Dzwoń pod 112.
+siln\w* bol\w* brzuch\w*|ostry brzuch|twardy brzuch|bol brzuch\w*.*goraczk => Silny ból brzucha, twardy brzuch lub z gorączką wymaga pilnej pomocy - dzwoń pod 112. Nie podawaj jedzenia, picia ani leków przeciwbólowych, bo maskują objawy.
+krew w wymiotach|wymioty z krwia|smolisty stolec|krew w stolcu|krew w kale|krew z odbytu => Krew w wymiotach, smoliste stolce lub krew w kale to sygnał alarmowy - dzwoń pod 112 albo natychmiast jedź na ostry dyżur. Nie jedz i nie pij.
+drgawk\w* goraczk\w*|goraczk\w*.*drgawk|drgawk\w*.*dzieck => Drgawki gorączkowe u dziecka - dzwoń pod 112. Ułóż dziecko bezpiecznie na boku, nie wkładaj nic do ust, nie przytrzymuj. Po ustąpieniu ataku kontroluj oddech.
+mrowien\w*|dretwien\w*|nagle oslabienie|niedowlad\w* => Nagłe drętwienie, niedowład lub osłabienie może oznaczać udar - dzwoń pod 112 i zanotuj godzinę początku objawów. Nie podawaj nic doustnie.
+
+# ==========================================================================
+# URAZY, RANY, SKORA
+# ==========================================================================
+skalecz\w*|przeci\w*|rozcie\w*|ran[aey]\b|ranie\b => Umyj ręce, przepłucz ranę czystą wodą, usuń widoczne zanieczyszczenia i załóż jałowy opatrunek. Uciskaj, jeśli krwawi. Przy głębokiej, silnie krwawiącej lub zabrudzonej ranie zgłoś się do lekarza i sprawdź szczepienie przeciw tężcowi.
+siniak\w*|stluk\w*|stlucz\w* => Przyłóż zimny okład na 15-20 minut przez tkaninę i unieś kończynę. Nie ugniatj. Jeśli ból i obrzęk narastają, kończyna jest zniekształcona lub nie możesz nią ruszać, zgłoś się do lekarza albo dzwoń pod 112.
+otar\w*|zdarci\w*|obtarci\w* => Oczyść delikatnie wodą, osusz i załóż jałowy opatrunek. Unikaj ucisku. Niepokojące są ropienie, narastający ból i gorączka - wtedy do lekarza.
+ukas\w*|uzadl\w*|ugryz\w*|pogryz\w*|pokasal\w*|pszczol\w*|osy\b|komar\w* => Po ukąszeniu owada usuń żądło (np. kartą), przyłóż zimny okład i unieś miejsce; nie drap. Po ugryzieniu przez zwierzę (pies, kot) przepłucz ranę wodą i jak najszybciej zgłoś się do lekarza - potrzebne jest szczepienie przeciw tężcowi i wściekliźnie. Dzwoń pod 112 przy duszności lub obrzęku twarzy i gardła.
+drzazga|cialo obce w skorze => Umyj miejsce, wyciągnij drzazgę jałową pęsetą zgodnie z kierunkiem wbicia i zdezynfekuj. Nie wyciągaj dużych ani głęboko wbitych przedmiotów - zostaw to lekarzowi.
+kleszcz\w* => Kleszcza usuń pęsetą przy samej skórze, pewnym ruchem, bez smarowania i wykręcania. Zdezynfekuj miejsce i obserwuj skórę przez 30 dni - przy rumieniu wędrującym albo gorączce idź do lekarza.
+oparzenie sloneczn\w*|spal\w* sie na sloncu|sloneczn\w* poparzen\w* => Chłodź skórę i nawadniaj się. Nie przekłuwaj pęcherzy, użyj kremu nawilżającego. Przy rozległym poparzeniu, gorączce, zawrotach lub splątaniu dzwoń pod 112.
+
+# ==========================================================================
+# GORACZKA I INFEKCJE
+# ==========================================================================
+goraczk\w*|mam temperatur|podwyzszon\w* temperatur => Gorączkę zbijaj, gdy przekracza 38,5 stopnia lub źle się czujesz: paracetamol albo ibuprofen według ulotki, dużo płynów i odpoczynek. Dzwoń pod 112 lub do lekarza przy temperaturze powyżej 40 stopni, drgawkach, sztywności karku, wysypce lub objawach odwodnienia.
+goraczk\w*[^.!?]{0,20}(niemowl|dzieck)|niemowl\w* goraczk|dziecko.*goraczk => Gorączka u niemowlęcia do 3. miesiąca życia powyżej 38 stopni wymaga pilnego kontaktu z lekarzem albo 112. Nie ochładzaj gwałtownie i nie podawaj leków bez zalecenia. Karm często, obserwuj dziecko.
+przezieb\w*|katar\b => Przeziębienie: odpoczynek, dużo płynów, nawilżanie powietrza, sól morska do nosa i leki objawowe według ulotki. Do lekarza, gdy gorączka utrzymuje się ponad 3 dni, pojawia się duszność lub objawy trwają ponad 10 dni.
+kaszel\b|kaszl\w* => Pij ciepłe płyny, nawilżaj powietrze; przy suchym kaszlu ulgę daje miód, ale nie podawaj go dzieciom do 1. roku życia. Do lekarza przy duszności, krwi w plwocinie, gorączce lub kaszlu trwającym ponad 3 tygodnie.
+bol\w* (mnie )?gardl|gardl\w* (mnie )?boli|bol gardl\w*|chrypk\w* => Pij chłodne lub ciepłe płyny, ssij tabletki na gardło i odpocznij. Zgłoś się do lekarza, gdy trudno połykać lub mówić, ślinisz się, masz wysoką gorączkę albo nalot na migdałkach.
+angin\w*|nalot\w* na migdalk|ropn\w* migdalk => Anginę rozpoznaje i leczy lekarz - typowo ból gardła z gorączką i nalotem na migdałkach. Idź do lekarza; antybiotyk bywa konieczny. Przy trudności w oddychaniu lub połykaniu dzwoń pod 112.
+gryp\w* => Grypa: leżenie, dużo płynów, leki przeciwgorączkowe i przeciwbólowe według ulotki. Do lekarza przy duszności, bólu w klatce, wysokiej gorączce ponad 3 dni lub nasilonym osłabieniu, zwłaszcza u osób starszych.
+zapalen\w* zatok|bol\w* zatok|zatoki\b => Nawilżaj powietrze, płucz nos solą fizjologiczną, stosuj przeciwbólowe według ulotki. Do lekarza, gdy gorączka przekracza 39 stopni, ból narasta, pojawia się obrzęk oka lub objawy trwają ponad 10 dni.
+zapalen\w* oskrzel|oskrzel\w* => Odpoczynek, płyny, nawilżanie powietrza; przy gorączce leki przeciwgorączkowe. Do lekarza przy duszności, świszczącym oddechu, gorączce ponad 3 dni lub krwi w plwocinie.
+zapalen\w* pluc|pluc\w* => Zapalenie płuc wymaga oceny lekarza. Dzwoń pod 112 przy duszności, sinieniu warg, splątaniu lub wysokiej gorączce z dreszczami. Nie czekaj z wizytą.
+zapalen\w* ucha|bol\w* (mnie )?ucho|ucho\w* (mnie )?boli|bol uch\w* => Podaj lek przeciwbólowy według ulotki i przyłóż ciepły okład. Zgłoś się do lekarza zwłaszcza z dzieckiem, przy gorączce, wycieku z ucha lub pogorszeniu słuchu.
+zapalen\w* spojow|zaczerwienion\w* oko|ropn\w* wydzielin\w*.*oka|zaropial\w* oko => Przecieraj oko jednorazowo jałowym gazikiem, nie dotykaj drugiego oka. Zdejmij soczewki. Do okulisty przy silnym bólu, zaburzeniach widzenia lub braku poprawy po 2 dniach.
+zapalen\w* pecherz|pieczen\w* przy (sikaniu|oddawaniu moczu)|bol\w* przy oddawaniu moczu|czest\w* oddawanie moczu => Pij dużo wody i nie wstrzymuj moczu. Zgłoś się do lekarza; przy gorączce, bólu w boku lub krwi w moczu pilnie, a przy dreszczach i bólu pleców dzwoń pod 112.
+jelitow\w*|grypa zoladkow\w*|wirusow\w* zapalenie zoladk => Nawadniaj się małymi porcjami, stosuj dietę lekkostrawną i odpoczywaj. Dzwoń pod 112 lub do lekarza przy krwi w wymiotach/stolcu, wysokiej gorączce, silnym bólu brzucha lub objawach odwodnienia.
+
+# ==========================================================================
+# BOLE I DOLEGLIWOSCI
+# ==========================================================================
+bol\w* (mnie )?glow|glow\w* (mnie )?boli|bol glow\w*|migren\w* => Odpocznij w cichym, przyciemnionym miejscu, napij się wody i według ulotki możesz przyjąć przeciwbólowy. Dzwoń pod 112, gdy ból jest nagły i najsilniejszy w życiu, po urazie głowy albo towarzyszą mu gorączka, sztywny kark, wymioty lub zaburzenia mowy i wzroku.
+migren\w* => Podczas migreny połóż się w cichym, ciemnym pokoju, nawodnij i przyjmij lek według zaleceń lekarza. Do neurologa lub lekarza, gdy ataki się nasilają; przy nowych objawach neurologicznych dzwoń pod 112.
+bol\w* (mnie )?brzuch|brzuch\w* (mnie )?boli|bol brzuch\w*|wzdeci\w*|kolka jelitow => Odpocznij, zastosuj ciepły okład i pij małe ilości płynów; nie jedz ciężkostrawnie. Dzwoń pod 112 przy silnym, twardym brzuchu, krwi, wysokiej gorączce lub bólu nasilającym się przy dotyku.
+bol\w* (mnie )?plec|plec\w* (mnie )?boli|bol plec\w*|bol kregoslup\w*|rwa kulszow => Odpocznij w wygodnej pozycji, zastosuj ciepło i według ulotki lek przeciwbólowy. Pilnie do lekarza przy drętwieniu kończyn, osłabieniu siły mięśniowej, zaburzeniach oddawania moczu lub po urazie.
+bol\w* (mnie )?miensn|miensn\w* (mnie )?boli|bol miesn\w*|zakwas\w*|bol po wysilk => Odpoczynek, łagodne rozciąganie, ciepła kąpiel i nawodnienie pomagają. Zgłoś się do lekarza, jeśli ból jest bardzo silny, mięśnie puchną, a mocz ciemnieje - to może być rabdomioliza.
+bol\w* (mnie )?staw|staw\w* (mnie )?boli|bol staw\w*|reumat\w* => Odciąż staw, zastosuj zimno przy obrzęku albo ciepło przy sztywności; lek przeciwbólowy według ulotki. Do lekarza/reumatologa przy obrzęku, zaczerwienieniu i gorączce lub utrzymujących się dolegliwościach.
+bol\w* (mnie )?zab|zab\w* (mnie )?boli|bol zeb\w*|bol zab\w* => Przyjmij lek przeciwbólowy według ulotki i przyłóż zimny okład na policzek. Idź do dentysty. Dzwoń pod 112 przy obrzęku twarzy lub szyi, trudności w połykaniu albo oddychaniu.
+zgag\w*|refluks\w*|pieczenie zoladka => Jedz mniejsze posiłki, unikaj kawy, alkoholu i tłustych potraw, nie jedz przed snem; pomóc mogą leki zobojętniające. Do lekarza, gdy objawy są częste, budzą w nocy lub utrudniają połykanie.
+niestrawn\w*|przejedzen\w*|ciezki brzuch => Odpocznij w pozycji półsiedzącej, pij wodę i zjedz coś lekkiego. Do lekarza przy silnym bólu, wymiotach, gorączce lub utrzymujących się objawach.
+nudnosc\w*|mdlosc\w*|choroba lokomocyjn\w* => Odpocznij, pij małe porcje wody lub naparu, unikaj tłuszczu. Przy wymiotach nawadniaj się elektrolitami. Dzwoń pod 112, jeśli nudnościom towarzyszy silny ból głowy, ból w klatce lub zaburzenia widzenia.
+biegunk\w* => Nawadniaj się płynami z elektrolitami, jedz lekkostrawnie i odpoczywaj. Dzwoń pod 112 lub do lekarza przy krwi w stolcu, wysokiej gorączce, silnym bólu brzucha, objawach odwodnienia albo biegunce u dziecka trwającej ponad 2 dni.
+zaparci\w*|zaparcie\b => Pij dużo wody, jedz błonnik, ruszaj się i nie wstrzymuj wizyty w toalecie. Do lekarza przy krwi w stolcu, silnym bólu, braku gazu lub zaparciu trwającym ponad 2 tygodnie.
+wymiot\w* => Nawadniaj się małymi łykami płynów elektrolitowych i odpoczywaj. Dzwoń pod 112 przy krwi lub żółci w wymiotach, silnym bólu głowy, sztywnym karku albo objawach odwodnienia.
+bol miesiaczkow|menstruacj\w*|okres boli|bol podbrzusza => Zastosuj ciepły okład, odpocznij i według ulotki lek przeciwbólowy. Do ginekologa przy bardzo silnym bólu nieustępującym po lekach, obfitym krwawieniu albo bólu z gorączką.
+kolka nerkow\w*|kamica nerkow\w*|krew w moczu|bol w boku.*mocz => Silny ból w boku promieniujący do pachwiny i krew w moczu to typowo kolka nerkowa - pilnie zgłoś się na ostry dyżur albo dzwoń pod 112. Pij wodę, ale nie podawaj leków bez zalecenia.
+hemoroid\w*|bol odbytu|guzki w odbycie|krwawienie z odbytu => Stosuj dietę bogatą w błonnik, pij wodę, unikaj parcia i długiego siedzenia. Zgłoś się do lekarza przy obfitym krwawieniu, silnym bólu lub zmianie utrzymującej się ponad 2 tygodnie.
+bol jadr\w*|obrzek jadr\w* => Nagły silny ból jądra wymaga pilnej pomocy - dzwoń pod 112 albo natychmiast jedź na ostry dyżur, bo zwłoka może kosztować utratę jądra. Unieś mosznę i nie podawaj leków bez zalecenia.
+
+# ==========================================================================
+# ALERGIE, SKORA, SAMOPOCZUCIE
+# ==========================================================================
+wysypk\w*|pokrzywk\w*|wysypka na skorze => Przyłóż chłodny okład, nie drap; możesz przyjąć lek przeciwhistaminowy według ulotki. Dzwoń pod 112 przy duszności, obrzęku twarzy lub gardła albo gwałtownym nasileniu wysypki.
+opryszczk\w* => Utrzymuj higienę, nie dotykaj zmian i stosuj miejscowy lek przeciwwirusowy. Do lekarza przy rozległych zmianach, zmianach w oku lub u osób z osłabioną odpornością.
+tradzik\w*|pryszcz\w* => Myj skórę łagodnym środkiem, nie wyciskaj zmian i stosuj leki dostępne bez recepty. Do dermatologa przy nasilonym trądziku lub bliznach.
+alergi\w*|katar sienny|pylk\w* => Unikaj alergenu, stosuj leki przeciwhistaminowe lub krople do nosa według ulotki. Dzwoń pod 112 przy duszności, świszczącym oddechu lub obrzęku twarzy - to może być anafilaksja.
+grzybic\w*|stopa sportowca => Utrzymuj skórę suchą i przewiewną, stosuj preparat przeciwgrzybiczy. Do lekarza, gdy zmiany są rozległe, bolą lub nie ustępują po 2 tygodniach.
+swedz|swierzb\w* => Chłodny okład i lek przeciwhistaminowy łagodzą świąd. Do lekarza przy świądzie całego ciała, nasilonym w nocy, z wysypką lub żółtaczką.
+bezsenn\w*|nie moge spac|problemy ze snem => Ustal stałe godziny snu, unikaj ekranów i kofeiny wieczorem, sypialnia ma być ciemna i chłodna. Do lekarza, gdy bezsenność utrzymuje się ponad 3 tygodnie lub wpływa na codzienne funkcjonowanie.
+stres\b|zdenerwowan\w*|napieci\w* => Zrób kilka wolnych oddechów (wdech 4 sekundy, zatrzymanie 4, wydech 6), wyjdź na spacer i ogranicz bodźce. Po wsparcie zgłoś się do psychologa, gdy napięcie utrzymuje się i przeszkadza w życiu.
+atak paniki|napad leku|niepokoj\w* => Powiedz sobie, że to minie, weź wolny, przeponowy oddech i skup się na przedmiotach wokół. Ważne: to nie zawał, ale przy bólu w klatce i duszności, których nie masz pewności, dzwoń pod 112. Przy powracających atakach pomaga psychoterapia.
+depresj\w*|przygnebien\w*|ciagly smutek|brak sensu => Nie zostawaj z tym sam, powiedz bliskiej osobie i umów się do lekarza lub psychologa. Jeśli pojawiają się myśli o śmierci lub samookaleczeniu, natychmiast dzwoń pod 112 albo 116 123 (kryzysowy telefon zaufania).
+odwodnien\w*|wymioty.*biegunk|sucho w ustach|brak lzawienia => Pij małymi porcjami płyny elektrolitowe. Dzwoń pod 112 przy braku moczu, zapadniętych oczach, senności, suchych ustach i utracie przytomności - szczególnie u dzieci i osób starszych.
+zatrucie pokarmow\w*|bakterie w jedzeniu|zespol jelitow\w* => Nawadniaj się elektrolitami i odpoczywaj. Dzwoń pod 112 lub do lekarza przy krwi w stolcu, wysokiej gorączce, silnym bólu brzucha lub objawach odwodnienia.
+anemi\w*|ciagle oslabienie|bladosc skory => Zgłoś się do lekarza na badania krwi. Dzwoń pod 112 przy duszności, bólu w klatce, omdleniu lub bardzo nasilonym osłabieniu.
+zawrot\w*|krecen\w* sie w glowie => Usiądź lub połóż się, wstań powoli i napij się wody. Dzwoń pod 112, gdy zawrotom towarzyszy mowa niewyraźna, niedowład, podwójne widzenie lub silny ból głowy.
+oslabien\w*|zmeczen\w*|brak sily => Odpocznij, nawadnij się, zadbaj o sen i posiłki. Do lekarza, gdy osłabienie utrzymuje się lub narasta; dzwoń pod 112 przy duszności, bólu w klatce lub omdleniu.
+zapalen\w* miesni|rabdomioliz\w*|ciemny mocz po wysilk => Ciemny mocz, silny ból i obrzęk mięśni po wysiłku wymagają pilnej pomocy - dzwoń pod 112 lub jedź na ostry dyżur i pij wodę.
+
+# ==========================================================================
+# ODPOWIEDZ OGOLNA (gdy zaden konkretny wpis nie pasuje)
+# ==========================================================================
+boli\b|bol\b => Odpocznij, zadbaj o wygodną pozycję i według ulotki możesz przyjąć lek przeciwbólowy. Pilnie dzwoń pod 112, jeśli ból jest nagły i bardzo silny, dotyczy klatki piersiowej, towarzyszy mu duszność, gorączka, drętwienie lub wystąpił po urazie.

@@ -1,0 +1,11 @@
+name: git_status
+description: stan repozytorium git (git status)
+order: 35
+patterns:
+  - 'git status(?:\s+(?:w\s+|dla\s+)?(?P<path>[~/][\w./+-]*))?'
+  - 'status (?:repozytorium|repo|git)(?:\s+git)?(?:\s+(?:w\s+|dla\s+)?(?P<path>[~/][\w./+-]*))?'
+  - 'stan repozytorium(?:\s+(?:git\s+)?(?:w\s+|dla\s+)?(?P<path>[~/][\w./+-]*))?'
+command: 'git -C {{path|@project}} status -sb'
+confirm: never
+timeout: 60
+done: 'Status repozytorium pokazany powyżej.'
