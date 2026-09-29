@@ -1,0 +1,11 @@
+name: journal
+description: ostatnie wpisy dziennika systemd dla usługi (journalctl)
+order: 10
+patterns:
+  - '(?:pokaz|sprawdz|wyswietl)\s+(?:mi\s+)?(?:ostatnie\s+|najnowsze\s+)?(?:logi|dziennik|journal)\s+(?:uslugi\s+|serwisu\s+|dla\s+|z\s+)?(?P<unit>[a-z0-9@._-]{2,})(?:\s+(?P<n>\d+))?'
+  - '(?:logi|dziennik)\s+uslugi\s+(?P<unit>[a-z0-9@._-]{2,})(?:\s+(?P<n>\d+))?'
+  - 'journalctl\s+(?:-u\s+)?(?P<unit>[a-z0-9@._-]{2,})'
+command: 'journalctl -u {{unit}} -n {{n|20}} --no-pager'
+confirm: never
+timeout: 60
+done: 'Ostatnie wpisy dziennika dla usługi {{unit}} wypisane powyżej.'

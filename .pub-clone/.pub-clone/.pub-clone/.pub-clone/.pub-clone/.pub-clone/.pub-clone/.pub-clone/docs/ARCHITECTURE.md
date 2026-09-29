@@ -85,7 +85,7 @@ Backendy: `chat`→NPU (jeśli gotowy) → CPU; `tools/json/plan`→CPU (póki N
 function-calling); `pc`/`remote` **tylko** gdy jawnie włączone.
 
 ## Ścieżki runtime
-- Kod: `$HOME/astro`
+- Kod: `/home/user/astro`
 - Dane: `~/astro/runtime/` (memory.db, knowledge, datasets, logs)
 - Usługa: `astro.service` (`Restart=on-failure`, log `~/astro/runtime/logs/astro.log`)
 - Piaskownica agenta: `~/astro-agent`
