@@ -1,0 +1,12 @@
+name: kernel_errors
+description: ostatnie błędy jądra / sprzętu (dmesg)
+order: 40
+patterns:
+  - 'bledy jadra'
+  - 'bledy sprzetu'
+  - 'problemy ze sprzetem'
+  - 'dmesg'
+command: "journalctl -k -p err -b --no-pager | tail -n 20"
+confirm: never
+timeout: 30
+done: 'Ostatnie błędy jądra pokazane powyżej.'

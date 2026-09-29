@@ -1,0 +1,12 @@
+name: trash_size
+description: rozmiar kosza i katalogów tymczasowych
+order: 22
+patterns:
+  - 'ile (?:zajmuje )?kosz'
+  - 'rozmiar kosza'
+  - 'ile (?:zajmuja )?pliki tymczasowe'
+  - 'smieci na dysku'
+command: 'du -sh ~/.local/share/Trash 2>/dev/null || true; echo "---"; du -sh /tmp /var/tmp 2>/dev/null || true'
+confirm: never
+timeout: 60
+done: 'Rozmiary kosza i katalogów tymczasowych pokazane powyżej.'
