@@ -79,12 +79,18 @@ class TestPathsAndAvailability(unittest.TestCase):
 
     def test_hef_path_default_repo(self):
         old = getattr(config, "VISION_HEF", "")
+        old_dir = getattr(config, "VISION_HAILO_DIR", None)
         config.VISION_HEF = ""
-        try:
-            p = hailo.hef_path()
-            self.assertTrue(p.endswith(config.VISION_OBJECT_HEF))
-        finally:
-            config.VISION_HEF = old
+        with tempfile.TemporaryDirectory() as tmp:
+            config.VISION_HAILO_DIR = tmp
+            dummy = os.path.join(tmp, config.VISION_OBJECT_HEF)
+            with open(dummy, "wb") as fh:
+                fh.write(b"dummy")
+            try:
+                self.assertEqual(hailo.hef_path(), dummy)
+            finally:
+                config.VISION_HEF = old
+                config.VISION_HAILO_DIR = old_dir
 
 
 class TestEngineIntegration(unittest.TestCase):
@@ -173,11 +179,18 @@ class TestFacePathsAndAvailability(unittest.TestCase):
 
     def test_face_hef_path_default_repo(self):
         old = getattr(config, "VISION_FACE_HEF", "")
+        old_dir = getattr(config, "VISION_HAILO_DIR", None)
         config.VISION_FACE_HEF = "scrfd_2.5g.hef"
-        try:
-            self.assertTrue(hailo.face_hef_path().endswith("scrfd_2.5g.hef"))
-        finally:
-            config.VISION_FACE_HEF = old
+        with tempfile.TemporaryDirectory() as tmp:
+            config.VISION_HAILO_DIR = tmp
+            dummy = os.path.join(tmp, "scrfd_2.5g.hef")
+            with open(dummy, "wb") as fh:
+                fh.write(b"dummy")
+            try:
+                self.assertEqual(hailo.face_hef_path(), dummy)
+            finally:
+                config.VISION_FACE_HEF = old
+                config.VISION_HAILO_DIR = old_dir
 
     def test_get_face_detector_gated(self):
         old = config.VISION_NPU
