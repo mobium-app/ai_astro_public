@@ -145,12 +145,38 @@ def _is_excluded(topic):
     return any(x in low for x in _excluded_topics())
 
 
+def _topic_coverage(topic, db_path=None):
+    """Iloraz wiedzy dziedziny: ile wpisów `learned` pokrywa jej słowa kluczowe.
+
+    Im MNIEJ wpisów, tym uboższa dziedzina — taka idzie NAJPIERW w biegu (reguła 2026-09-30:
+    „zacznij od tematów o najmniejszym ilorazie wiedzy, co rundę zmieniaj tematykę").
+    Słowa kluczowe bierzemy z nawiasu opisu dziedziny (np. „finanse osobiste i bankowość
+    (aktywa, pasywa, inwestycje, banki…)")."""
+    try:
+        import sqlite3
+        path = db_path or str(config.DB_PATH)
+        con = sqlite3.connect(path)
+        titles = [r[0].lower() for r in con.execute("SELECT title FROM learned")]
+        con.close()
+    except Exception:
+        return 0
+    m = re.search(r"\(([^)]+)\)", topic)
+    words = [w for w in re.split(r"[,;()]", (m.group(1) if m else topic).lower())
+             if w.strip() and len(w.strip()) > 3]
+    if not words:
+        return 0
+    return sum(1 for t in titles if any(w in t for w in words))
+
+
 def _topic_sequence():
     """Kolejność dziedzin na bieg: ~80% priorytetowych / ~20% ogólnych (bloki 4+1).
 
     Priorytet: bloki 5 rund = 4 dziedziny priorytetowe + 1 ogólna (maks. 20% ogólnych w każdym
     oknie). W obrębie bloku kolejność losowa; pierwsza dziedzina != ostatnio użytej (rotacja).
-    Dziedziny z `ASTRO_EXCLUDE_TOPICS` są pomijane (profil „mniej duplikatów")."""
+    Dziedziny z `ASTRO_EXCLUDE_TOPICS` są pomijane (profil „mniej duplikatów").
+    Gdy `ASTRO_LOOP_GAP_FIRST=1`: dziedziny sortowane wg ILORAZU WIEDZY (najuboższe najpierw),
+    a kolejne rundy zmieniają tematykę wg rotacji (reguła 2026-09-30)."""
+    gap_first = os.environ.get("ASTRO_LOOP_GAP_FIRST", "0") == "1"
     priority = [i for i in range(_N_PRIORITY) if not _is_excluded(_TOPICS[i])]
     general = [i for i in range(_N_PRIORITY, len(_TOPICS)) if not _is_excluded(_TOPICS[i])]
     if not priority:
@@ -158,8 +184,14 @@ def _topic_sequence():
     if not general:
         general = list(range(_N_PRIORITY, len(_TOPICS)))
     rnd = random.Random()
-    p_order = rnd.sample(priority, len(priority)) or [0]
-    g_order = rnd.sample(general, len(general)) or [0]
+    if gap_first:
+        # Najuboższe dziedziny NAJPIERW (rosnące pokrycie), losowość tylko wewnątrz grup.
+        priority.sort(key=lambda i: _topic_coverage(_TOPICS[i]))
+        general.sort(key=lambda i: _topic_coverage(_TOPICS[i]))
+        p_order, g_order = priority, general
+    else:
+        p_order = rnd.sample(priority, len(priority)) or [0]
+        g_order = rnd.sample(general, len(general)) or [0]
     seq, pi, gi = [], 0, 0
     while len(seq) < 240:
         # 4 RÓŻNE dziedziny priorytetowe (przesunięcie o k), nie 4× ta sama (błąd naprawiony).

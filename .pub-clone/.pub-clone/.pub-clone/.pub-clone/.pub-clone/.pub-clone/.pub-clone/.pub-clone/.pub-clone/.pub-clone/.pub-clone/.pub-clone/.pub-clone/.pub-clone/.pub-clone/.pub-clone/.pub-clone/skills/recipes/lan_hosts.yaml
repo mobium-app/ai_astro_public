@@ -1,0 +1,12 @@
+name: lan_hosts
+description: urządzenia w sieci lokalnej (tablica ARP, bez nmap)
+order: 52
+patterns:
+  - 'kto jest w sieci'
+  - 'skanuj siec|przeskanuj siec|skan sieci'
+  - 'urzadzenia w sieci|hosty w sieci'
+  - 'jacy (?:urzadzenia|hosty) w sieci'
+command: "ip -4 neigh show | grep -v FAILED | sort -u"
+confirm: never
+timeout: 30
+done: 'Urządzenia widziane w sieci lokalnej pokazane powyżej.'

@@ -3,6 +3,8 @@
 Dziękujemy za zainteresowanie ulepszaniem ASTRO! Ten projekt powstał jako
 samodzielny, uczący się agent — każda dobra zmiana przyspiesza jego rozwój.
 
+Więcej o projekcie: **[netrunner.edu.pl/projekt-astro](https://netrunner.edu.pl/projekt-astro)**
+
 ## Jak zacząć
 1. Zforkuj repo i sklonuj swoją kopię.
 2. Zainstaluj zależności: `pip install -r requirements.txt`.
