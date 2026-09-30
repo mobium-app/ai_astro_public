@@ -1,0 +1,11 @@
+name: recent_changes
+description: pliki zmienione w ostatniej dobie w katalogu (find -mtime)
+order: 30
+patterns:
+  - 'co sie (?:zmienilo|zmienialo) (?:w |dzisiaj w )?(?P<path>[~/][\w./+-]*)'
+  - 'ostatnio zmienione pliki(?: w (?P<path>[~/][\w./+-]*))?'
+  - 'najnowsze pliki(?: w (?P<path>[~/][\w./+-]*))?'
+command: "find {{path|~}} -type f -mtime -1 -not -path '*/.git/*' -printf '%T+ %p\\n' 2>/dev/null | sort -r | head -n 20"
+confirm: never
+timeout: 60
+done: 'Pliki zmienione w ostatniej dobie pokazane powyżej.'

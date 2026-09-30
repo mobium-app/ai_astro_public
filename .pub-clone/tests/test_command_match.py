@@ -97,6 +97,40 @@ class TestCommandMatch(unittest.TestCase):
         self.assertEqual(cm.canonicalize("zaaktualizuj programy"), "aktualizuj programy")
         self.assertGreaterEqual(cm.similarity("zainstaluj program", "instaluj program"), 0.95)
 
+    def test_variable_prefix_match(self):
+        # Komendy ze zmienną [.zmienna.] muszą łapać wypowiedź z PODSTAWIONĄ wartością
+        # („…w Poznań", „…google.pl", „…Michał") — prefiks + dowolne słowo (kalibracja 2026-09-30).
+        cases = {
+            "jaka jest pogoda w Poznań": "jaka jest pogoda w",
+            "podaj adres najbliższego bankomatu": "podaj adres najbliższego",
+            "adres ip dla google.pl": "adres ip dla",
+            "zapamiętaj to jest Michał": "zapamietaj, to jest",
+            "zapomnij Kasia": "zapomnij",
+            "instaluj aplikacje mc": "instaluj aplikacje",
+            "ping 192.168.0.4": "ping",
+        }
+        for spoken, expected in cases.items():
+            cmd, score = cm.best(spoken)
+            self.assertEqual(cmd, expected, f"{spoken!r} -> {cmd!r} ({score})")
+            self.assertGreaterEqual(score, 0.80, spoken)
+
+    def test_variable_prefix_no_false_positive(self):
+        # Prefiks-ze-zmienną NIE łapie pytań niezwiązanych (bez prefiksu komendy).
+        for text in ("czy pogoda jutro się poprawi",
+                     "co sądzisz o pogodzie w tym roku",
+                     "czy pamiętasz co jadłem na obiad"):
+            cmd, _ = cm.best(text)
+            self.assertIsNone(cmd, f"{text!r} nie powinno mapować się na komendę ({cmd!r})")
+
+    def test_variable_commands_listed(self):
+        # Komendy wykonawcze ze zmienną są wykrywane (nie pytania CZAT).
+        vc = set(cm.variable_commands())
+        self.assertIn("instaluj aplikacje", vc)
+        self.assertIn("ping", vc)
+        self.assertIn("adres ip dla", vc)
+        # Pytanie CZAT ze zmienną NIE jest komendą wykonawczą.
+        self.assertNotIn("co to jest", vc)
+
 
 if __name__ == "__main__":
     unittest.main()
