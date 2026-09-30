@@ -132,6 +132,8 @@ def _must_have_phrases(path=None):
         if hashes == 2 and body.isupper():
             continue
         body = re.sub(r"\([^)]*\)?", "", body)
+        body = re.split(r"\s*[-–—]{2,}\s*>\s*|\s*→\s*", body)[0]  # wycina opis po „---->"
+        body = re.sub(r"\s*[-–—]>\s*", " ", body)  # dalsze strzałki w opisie („->")
         body = re.sub(r"\s*-\s+", " - ", body).split(" - ")[0]
         body = body.replace("[...]", "").strip()
         body = re.sub(r"\[([^\]]*)\]",
@@ -155,6 +157,8 @@ def _section_prefix(section):
         return "skrypt"
     if "TERMINAL" in s:
         return "terminal"
+    if "SKAJNET" in s or "SKYNET" in s:
+        return "skajnet"
     if "CZAT" in s or "SMAL" in s or "SMALL" in s:
         return "czat"
     return ""
@@ -163,7 +167,10 @@ def _section_prefix(section):
 def build_command_grammar(extra=None, musthave_path=None):
     """Gramatyka komend = wbudowane frazy + must-have + `ASTRO_COMMAND_EXTRA` (+ [unk])."""
     phrases = list(COMMAND_PHRASES)
-    phrases += ["skrypt", "terminal", "czat"]  # same prefiksy kanału (must-have 2026-09-27)
+    # Same prefiksy kanału (must-have 2026-09-27) + warianty „skajnet" słyszane przez STT
+    # (kalibracja 2026-09-30: steimet/skajnij/skinette…) — żeby Vosk je rozpoznawał.
+    phrases += ["skrypt", "terminal", "czat", "skajnet", "skynet", "steimet",
+                "stejmet", "stajnet", "skajnij", "skinette", "skinet"]
     phrases += _must_have_phrases(musthave_path)
     env_extra = getattr(config, "COMMAND_EXTRA", "") or ""
     phrases += [normalize_facts(p) for p in env_extra.split(",") if p.strip()]

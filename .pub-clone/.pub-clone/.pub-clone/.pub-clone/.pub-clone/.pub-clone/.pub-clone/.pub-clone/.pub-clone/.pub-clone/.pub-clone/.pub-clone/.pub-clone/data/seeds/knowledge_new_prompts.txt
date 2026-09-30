@@ -1,0 +1,199 @@
+Czym różni się kompilacja od interpretacji kodu?
+Co to jest złożoność obliczeniowa algorytmu i notacja O?
+Jak działa szyfrowanie asymetryczne?
+Czym jest protokół TCP i czym różni się od UDP?
+Jak działa DNS i po co są serwery nazw?
+Co to jest HTTPS i jak zapewnia bezpieczeństwo?
+Czym jest kontener Docker i czym różni się od maszyny wirtualnej?
+Co to jest REST API i jakie ma zasady?
+Jak działa indeks w bazie danych?
+Czym różni się SQL od NoSQL?
+Co to jest rekurencja i kiedy ją stosować?
+Czym jest system kontroli wersji Git?
+Co to jest gałąź w Git i do czego służy?
+Jak działa pamięć cache procesora?
+Czym jest proces i czym różni się od wątku?
+Co to jest deadlock i jak go unikać?
+Czym jest model OSI i ile ma warstw?
+Co to jest adres IP i czym różni się IPv4 od IPv6?
+Jak działa maska podsieci?
+Czym jest firewall i jak filtruje ruch?
+Co to jest phishing i jak się przed nim chronić?
+Czym jest ransomware?
+Co to jest dwuskładnikowe uwierzytelnianie?
+Czym jest menedżer haseł i dlaczego jest bezpieczny?
+Co to jest VPN i jak działa?
+Czym jest chmura obliczeniowa?
+Co to jest webhook?
+Czym jest JSON i do czego się go używa?
+Co to jest cache przeglądarki?
+Czym jest cookie i localStorage?
+Na czym polega algorytm sortowania quicksort?
+Czym jest drzewo binarne BST?
+Co to jest tablica haszująca?
+Czym jest programowanie obiektowe i jego filary?
+Co to jest wzorzec projektowy singleton?
+Czym jest test jednostkowy?
+Co to jest integracja ciągła CI/CD?
+Czym jest regresja w uczeniu maszynowym?
+Co to jest sieć neuronowa?
+Czym różni się uczenie nadzorowane od nienadzorowanego?
+Czym jest podatek PIT i jak się go rozlicza w Polsce?
+Co to jest VAT i kto go płaci?
+Czym jest składka ZUS i kto jest nią objęty?
+Co to jest podatek Belki?
+Czym jest konto IKZE i jakie daje korzyści?
+Czym jest IKE i czym różni się od IKZE?
+Co to jest PPK Pracownicze Plany Kapitałowe?
+Czym jest lokata bankowa i jak naliczane są odsetki?
+Co to jest konto oszczędnościowe?
+Czym są obligacje skarbowe i jak działają?
+Co to jest fundusz inwestycyjny?
+Czym jest ETF?
+Co to jest dywidenda?
+Czym jest akcja i co daje jej posiadanie?
+Co to jest indeks giełdowy WIG20?
+Czym jest obligacja korporacyjna?
+Co to jest stopa procentowa i kto ją ustala?
+Czym jest inflacja i jak wpływa na oszczędności?
+Co to jest deflacja?
+Czym są stopy referencyjne NBP?
+Co to jest kredyt hipoteczny i jak działa?
+Czym jest marża kredytu?
+Co to jest RRSO?
+Czym jest zdolność kredytowa?
+Co to jest BIK?
+Czym jest scoring kredytowy?
+Co to jest pożyczka pozabankowa i na co uważać?
+Czym jest ubezpieczenie na życie?
+Co to jest polisa OC i AC?
+Czym jest ubezpieczenie zdrowotne dodatkowe?
+Co to jest budżet domowy i jak go prowadzić?
+Czym jest poduszka finansowa?
+Co to jest dywersyfikacja portfela?
+Czym jest ryzyko inwestycyjne?
+Co to jest dźwignia finansowa?
+Czym jest spread walutowy?
+Co to jest kantor wymiany walut?
+Czym jest pranie pieniędzy i AML?
+Co to jest KNF?
+Czym jest Bankowy Fundusz Gwarancyjny?
+Skąd pochodzi zwyczaj Bożego Narodzenia?
+Jakie są tradycje wielkanocne w Polsce?
+Czym jest śmigus-dyngus?
+Skąd wziął się zwyczaj topienia Marzanny?
+Czym są Andrzejki i co się wtedy wróży?
+Czym są otrzęsiny studenckie?
+Jakie są zasady savoir-vivre przy stole?
+Jak poprawnie witać się w sytuacji służbowej?
+Kto pierwszy podaje rękę przy powitaniu?
+Jak ubrać się na rozmowę kwalifikacyjną?
+Jakie są zasady ubioru na ślubie?
+Co to jest dress code business casual?
+Jak wręczać i przyjmować prezenty?
+Jakie kwiaty daje się na różne okazje?
+Czym jest pierwsza komunia święta?
+Jakie są polskie tradycje weselne?
+Czym jest oczepiny?
+Skąd zwyczaj dzielenia się opłatkiem?
+Dlaczego na Wigilię jest dwanaście potraw?
+Czym jest tłusty czwartek?
+Czym jest ostatki i śledzik?
+Kiedy obchodzi się Wszystkich Świętych i Zaduszki?
+Jakie są polskie przysłowia ludowe o pogodzie?
+Czym jest Dzień Matki i Dzień Ojca?
+Czym jest Dzień Kobiet?
+Czym jest Dzień Dziecka?
+Jakie są zwyczaje majówkowe?
+Czym jest noc świętojańska i sobótka?
+Skąd pochodzi zwyczaj Mikołajek?
+Jakie są tradycje dożynkowe?
+Czym jest etykieta mailowa?
+Jakich tematów unikać przy stole?
+Jak zachować się jako spóźniony gość?
+Jaka jest poprawna kolejność sztućców?
+Jakie są zasady kieszonkowego dla dzieci?
+Na czym polegają ukłony w kulturze Japonii?
+Jakie są różnice kulturowe w punktualności?
+Jak wygląda etykieta w krajach arabskich?
+Jakie są zasady dawania napiwku w Polsce?
+Jak zachować się w windzie według savoir-vivre?
+Czym jest socjalizacja?
+Co to jest grupa społeczna?
+Czym jest norma społeczna?
+Co to jest konformizm społeczny?
+Czym jest efekt bystandera?
+Na czym polega teoria gier w naukach społecznych?
+Czym jest kapitał społeczny?
+Co to jest stratyfikacja społeczna?
+Czym jest mobbing i jak go rozpoznać?
+Co to jest wykluczenie społeczne?
+Czym jest dzietność i co wpływa na jej spadek?
+Co to jest migracja i jakie ma typy?
+Czym jest demografia?
+Co to jest społeczeństwo informacyjne?
+Czym jest globalizacja?
+Co to jest konflikt pokoleń?
+Czym jest komunikacja niewerbalna?
+Co to jest asertywność?
+Czym jest empatia?
+Co to jest inteligencja emocjonalna?
+Czym jest manipulacja i jak się przed nią bronić?
+Co to jest syndrom sztokholmski?
+Czym jest wypalenie zawodowe?
+Co to jest work-life balance?
+Czym jest pracoholizm?
+Co to jest wolontariat?
+Czym jest organizacja pozarządowa NGO?
+Co to jest społeczeństwo obywatelskie?
+Czym różni się patriotyzm od nacjonalizmu?
+Co to jest tolerancja?
+Czym jest stereotyp i uprzedzenie?
+Co to jest patriarchat i matriarchat?
+Czym jest równość płci?
+Co to jest feminizm?
+Czym jest gentryfikacja miast?
+Co to jest bezrobocie i jakie ma rodzaje?
+Czym jest pomoc społeczna?
+Na czym polega podział pracy w społeczeństwie?
+Czym jest ruch społeczny?
+Co to jest opinia publiczna?
+Czym jest trójpodział władzy?
+Co to jest konstytucja?
+Jak działa polski parlament?
+Czym różni się Sejm od Senatu?
+Czym jest Rada Ministrów?
+Co to jest wotum nieufności?
+Czym jest vacatio legis?
+Co to jest Trybunał Konstytucyjny?
+Czym jest Sąd Najwyższy?
+Co to jest Krajowa Rada Sądownictwa?
+Czym jest Rzecznik Praw Obywatelskich?
+Co to jest Najwyższa Izba Kontroli?
+Czym jest immunitet parlamentarny?
+Co to jest referendum?
+Jak działa ordynacja wyborcza w Polsce?
+Czym jest próg wyborczy?
+Co to jest frekwencja wyborcza?
+Na czym polega ordynacja proporcjonalna?
+Czym różni się system prezydencki od parlamentarnego?
+Czym jest monarchia konstytucyjna?
+Co to jest federacja?
+Czym jest suwerenność państwa?
+Co to jest Unia Europejska?
+Czym jest Traktat Lizboński?
+Co to jest Parlament Europejski?
+Czym jest Komisja Europejska?
+Co to jest Rada Europejska?
+Czym jest NATO i jaka jest jej rola?
+Co to jest ONZ?
+Czym jest Rada Bezpieczeństwa ONZ?
+Co to jest dyplomacja?
+Czym jest prawo międzynarodowe?
+Co to jest Konwencja Genewska?
+Czym jest umowa handlowa i cło?
+Czym jest polityka fiskalna państwa?
+Co to jest polityka monetarna banku centralnego?
+Czym jest dług publiczny?
+Co to jest deficyt budżetowy?
+Czym jest budżet państwa?
