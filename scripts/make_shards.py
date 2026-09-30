@@ -42,6 +42,10 @@ def main():
                     help="ile razy powtórzyć rekordy czatu (bez narzędzi) w treningu")
     ap.add_argument("--only-chat", action="store_true",
                     help="tylko rekordy CZATU (bez narzędzi) — adapter czatu/polszczyzny")
+    ap.add_argument("--chat-frac", type=float, default=0.0,
+                    help="ułamek rekordów czatu DOŁĄCZONY do treningu narzędzi (0..1; np. 0.08 "
+                         "= 8%% czatu przy tool-only). Zabija artefakt `<tool_call>` w rozmowie "
+                         "bez dławienia tool-callingu (wniosek tools-r1, 2026-09-30)")
     args = ap.parse_args()
 
     tr = load(os.path.join(src, "astro_train.jsonl"))
@@ -50,7 +54,12 @@ def main():
         tr = [r for r in tr if is_chat(r)]
         va = [r for r in va if is_chat(r)]
     elif args.chat_weight <= 0:               # 0 = całkowicie pomiń rekordy czatu (tool-only)
-        tr = [r for r in tr if not is_chat(r)]
+        chat_rows = [r for r in tr if is_chat(r)]
+        keep = int(round(len(chat_rows) * args.chat_frac)) if args.chat_frac > 0 else 0
+        if keep:
+            random.Random(42).shuffle(chat_rows)
+            chat_rows = chat_rows[:keep]
+        tr = [r for r in tr if not is_chat(r)] + chat_rows
         va = [r for r in va if not is_chat(r)]
     tr_w = []
     for r in tr:
