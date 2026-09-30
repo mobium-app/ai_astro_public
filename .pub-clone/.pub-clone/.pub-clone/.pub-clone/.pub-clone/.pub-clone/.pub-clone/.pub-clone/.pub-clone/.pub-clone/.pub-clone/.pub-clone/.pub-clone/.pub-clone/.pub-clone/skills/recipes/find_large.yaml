@@ -1,0 +1,12 @@
+name: find_large
+description: największe pliki i katalogi w danej lokalizacji
+order: 55
+patterns:
+  - 'najwieksze (?:pliki|katalogi|rzeczy)\s+w\s+(?P<path>[~/][\w./+-]+)'
+  - 'co zajmuje (?:najwiecej )?(?:miejsca|dysku|pamieci)\s+w\s+(?P<path>[~/][\w./+-]+)'
+  - 'najwieksze pliki'
+  - 'znajdz duze pliki'
+command: 'du -ah {{path|~}} 2>/dev/null | sort -rh | head -n 15'
+confirm: never
+timeout: 300
+done: 'Największe pozycje wypisane powyżej.'

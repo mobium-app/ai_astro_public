@@ -200,6 +200,7 @@ class TestVlmBackend(unittest.TestCase):
 
     def test_caption_prefers_hailo(self):
         with mock.patch.object(config, "VLM_HAILO", True), \
+             mock.patch.object(vision, "_hailo_vlm_ready", return_value=True), \
              mock.patch.object(vision, "_vlm_caption_hailo", return_value="Widzę osobę."):
             self.assertEqual(vision._vlm_caption("/tmp/x.jpg"), "Widzę osobę.")
 

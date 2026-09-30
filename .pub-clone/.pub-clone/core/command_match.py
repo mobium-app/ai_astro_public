@@ -128,35 +128,67 @@ def similarity(a, b):
 
 def _commands(path=None):
     path = path or getattr(config, "MUSTHAVE_FILE", "")
+    cmds, _var = _load(path)
+    return cmds
+
+
+def _load(path=None):
+    """(komendy, komendy-ze-zmienną) z pliku must-have; sekcja + placeholder śledzone.
+
+    `var` = komendy WYKONAWCZE (nie CZAT), które w oryginale miały `[.zmienna.]`/`[.tekst.]`/
+    `[.host.]`/`[.imię.]` — dla nich wolno dopasowywać prefiks + dowolne słowo (użytkownik
+    wypowiada komendę z podstawioną wartością zmiennej). Pytania CZAT ze zmiennymi celowo
+    NIE wchodzą (idą do czatu/remote, nie do ścieżki komend)."""
+    path = path or getattr(config, "MUSTHAVE_FILE", "")
+    if not path:
+        return [], []
+    try:
+        mtime = os.path.getmtime(path) if path else None
+    except OSError:
+        mtime = None
+    if _CACHE["path"] == path and _CACHE["mtime"] == mtime and _CACHE["cmds"]:
+        return _CACHE["cmds"], _CACHE["var"]
     try:
         with open(path, encoding="utf-8", errors="replace") as fh:
             lines = fh.readlines()
     except OSError:
-        return []
-    out = []
+        return [], []
+    out, var = [], []
+    section = ""
     for line in lines:
         s = line.strip()
         if not s.startswith("#"):
             continue
         hashes = len(s) - len(s.lstrip("#"))
         body = s.lstrip("#").strip()
-        if hashes == 1 or not body:
+        if hashes == 1:
+            if "---->" not in s:
+                section = body
+            continue
+        if not body:
             continue
         if hashes == 2 and " " not in body and "/" not in body and body.isupper():
             continue
+        had_var = "[." in body
         body = _PLACEHOLDER_RE.sub("", _PAREN_RE.sub("", body))
         # Opis oddzielony strzałką („---->", „→") — bierzemy część przed strzałką.
         body = _ARROW_RE.split(body)[0]
         # Stara forma „ - " (opis myślnikiem) — dla zgodności wstecznej.
         body = re.sub(r"\s+-\s+", " - ", body).split(" - ")[0]
+        sec = section.upper()
+        exec_section = not any(w in sec for w in ("CZAT", "SMAL", "SMALL", "ROZMOW"))
         for part in re.split(r"\s*/\s*", body):
             part = re.sub(r"\s+", " ", part).strip(" .-–—")
             if len(part) >= 4:
                 out.append(part)
-    return list(dict.fromkeys(out))
+                if had_var and exec_section:
+                    var.append(part)
+    _CACHE.update({"path": path, "mtime": mtime, "cmds": list(dict.fromkeys(out)),
+                   "var": list(dict.fromkeys(var))})
+    return _CACHE["cmds"], _CACHE["var"]
 
 
-_CACHE = {"path": None, "mtime": None, "cmds": []}
+_CACHE = {"path": None, "mtime": None, "cmds": [], "var": []}
 
 
 def commands(path=None):
@@ -164,26 +196,45 @@ def commands(path=None):
 
     Wcześniej cache był kluczowany SAMĄ ścieżką — edycja `/etc/astro-secrets/komendy_must-have`
     nie działała bez restartu usługi. Teraz klucz zawiera mtime pliku (M: cache invalidation)."""
-    path = path or getattr(config, "MUSTHAVE_FILE", "")
-    try:
-        mtime = os.path.getmtime(path) if path else None
-    except OSError:
-        mtime = None
-    if _CACHE["path"] != path or _CACHE["mtime"] != mtime:
-        _CACHE["cmds"] = _commands(path)
-        _CACHE["path"] = path
-        _CACHE["mtime"] = mtime
-    return _CACHE["cmds"]
+    return _load(path)[0]
+
+
+def variable_commands(path=None):
+    """Komendy wykonawcze ze zmienną `[.x.]` (patrz `_load`) — dla dopasowania prefiksowego."""
+    return _load(path)[1]
+
+
+def _prefix_var_score(text, cmd):
+    """0..1: komenda-wzorzec ze zmienną jako PREFIKS wypowiedzi + dowolne słowa.
+
+    „jaka jest pogoda w Poznań" vs „jaka jest pogoda w" -> 0,93. Wymagany ≥1 token komendy
+    na początku wypowiedzi (fuzzy per token) i sensowne pokrycie (komenda ≥ 25% wypowiedzi);
+    inaczej 0 — nie łapie przypadkowych pytań zaczynających się od tego samego słowa."""
+    t = normalize(canonicalize(text)).split()
+    c = normalize(canonicalize(cmd)).split()
+    if not c or len(t) < len(c):
+        return 0.0
+    for tw, cw in zip(t[:len(c)], c):
+        if SequenceMatcher(None, tw, cw).ratio() < 0.75 and phonetic(tw) != phonetic(cw):
+            return 0.0
+    coverage = len(c) / len(t)
+    if coverage < 0.15:
+        return 0.0
+    return 0.85 + 0.1 * coverage
 
 
 def best(text, threshold=0.80, path=None):
     """(kanoniczna fraza, wynik) dla najlepszego dopasowania albo (None, wynik)."""
     if not (text or "").strip():
         return None, 0.0
-    cmds = _commands(path) if path else commands()
+    cmds, var_cmds = _load(path)
     best_cmd, best_score = None, 0.0
     for cmd in cmds:
         sc = similarity(text, cmd)
+        if sc > best_score:
+            best_cmd, best_score = cmd, sc
+    for cmd in var_cmds:
+        sc = _prefix_var_score(text, cmd)
         if sc > best_score:
             best_cmd, best_score = cmd, sc
     if best_score >= threshold:

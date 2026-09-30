@@ -1,0 +1,145 @@
+# KOMENDY KTÓRE OBOWIAZKOWO MUSZĄ DZIAŁAĆ -> [komendy pisze już tylko 'fonetycznie' - tak jak brzmią] -> w kwadratowym nawiasie [.zmienna.] wskazuje zmienne
+
+
+# KOMENDY uruchamiane są z prefix głosowym 'TERMINAL' (tool-calling)
+
+## wyłącz system / zamknij system / wyłącz się 											----> wyłącza bezpiecznie system (shutdown now) (potwierdzenie)
+## restart systemu / reset systemu / resetuj się 										----> restartuje system (reboot now) (potwierdzenie)
+## pokaż zasoby systemowe / wyświetl zasoby systemowe / zasoby systemowe 							----> wyświetla drzewko z zasobami i czyta
+## pokaż zasoby zdalne / wyświetl zasoby zdalne / pokaż zasoby remołt / wyświetl zasoby remołt / zasoby remołt 			----> wyświetla drzewko z zasobami agentów remote_ai i czyta
+## aktualizuj repozytoria / aktualizuj zródła / updejt repo 									----> aktualizacja repo - odpowiednik komendy (sudo apt-get update)
+## aktualizuj aplikacje / aktualizuj programy / updejt apps 									----> aktualizacja apps - odpowiednik komendy (sudo apt-get upgrade)
+## instaluj aplikacje [.zmienna.] / instaluj program [.zmienna.]								----> instaluje aplikacje - odpowiednik komendy (sudo apt-get install [.nazwa.])
+## podaj temperaturę procesora / temperatura procesora / podaj temperature ce pe u / temperatura ce pe u 			----> podaje tylko temperature cpu (bez innych parametrów)
+## która godzina / podaj godzinę / aktualna godzina / godzina 									----> mówi TYLKO godzinę (bez innych parametrów)
+## jaki dzisiaj dzień / jaki dzień / podaj datę / data 										----> mówi tylko datę (bez innych parametrów)
+## otwórz openkołd / openkołd / uruchom openkołd 										----> otwiera agenta OpenCode
+## przerwij / zatrzymaj / stop / koniec 											----> przerywa proces podczas długiej złej wypowiedzi (na przykład czytanie niezrozumiałego kodu terminala)
+## źle / błąd / dramat / 													----> informacja dla Astro że komenda została źle wykonana - nie rejestruje i nie uczy się
+## dobrze / okej / super / tak trzymaj /spoko 											----> informacja dla Astro że komenda zostala dobrze wykonana - warto ją ZAPISAĆ i utrwalić (uczyć się)
+## ścisz głos / ścisz dźwięk / ciszej / trochę ciszej / zmniejsz głośność							----> zmniejsza głośość o 10% - każda kolejna komenda zmniejsza volume (skok progu o 10% -> minimalna 20%)
+## podgłośń głos / podgłośń dźwięk / głośniej / zwiększ głoścność								----> zwieksza głośność o 10% - każda kolejna komenda zwiększa volume (skok progu o 10% -> maksymalna 100%)
+## jaka głośność / jaki poziom dźwięku / jaki dzwięk 										----> mówi na ile % ustawione volume aktualnie
+## generuj raport zasoby / raport zasoby 											----> generuje raport HTML z zasobami w folderze udostępnionym
+## podaj swoje aj pi / podaj aj pi / aj pi 											----> mówi swoj aktualny adres IP (tylko faktyczny w sieci wewnetrznej -> nie czyta calego 'ifconfig' tylko swoj 		adres z wl0/ln0)
+## czy pamiętasz kontekst / ostatni kontekst 											----> zgłasza ile czasu przechowuje aktualny kontekst (przefiltrowany wartosciowy)
+## ile jest wolnego miejsca / zajętość dysków / stan dysków / wolne miejsce na dysku 						----> pokazuje zajętość dysków i partycji (df -h)
+## lista dysków / jakie są dyski / partycje / lsblk 										----> pokazuje dyski, partycje i punkty montowania (lsblk)
+## jak długo działa system / czas działania systemu / od kiedy działa system / uptime 						----> pokazuje czas działania systemu i średnie obciążenie
+## procesy z największym zużyciem procesora / co zjada procesor / obciążenie procesora / co obciąża cpu 			----> pokazuje 10 procesów z największym zużyciem CPU
+## procesy z największym zużyciem pamięci / co zjada ram / co zjada pamięć 							----> pokazuje 10 procesów z największym zużyciem RAM
+## działające usługi / jakie usługi działają / lista usług 									----> pokazuje działające usługi systemd
+## usługi z błędami / usługi które nie działają / nieudane usługi / problemy z usługami 						----> pokazuje usługi systemd zakończone błędem
+## nasłuchujące porty / otwarte porty / jakie porty są otwarte 									----> pokazuje nasłuchujące porty TCP (ss -tlnp)
+## aktywne połączenia / połączenia sieciowe / co jest podłączone do sieci 							----> pokazuje aktywne połączenia sieciowe
+## błędy jądra / błędy sprzętu / problemy ze sprzętem / dmesg 									----> pokazuje ostatnie błędy jądra/sprzętu (journalctl -k -p err)
+## temperatura czujników / czy się przegrzewa / czujniki temperatury 								----> pokazuje temperatury czujników i stan throttlingu (vcgencmd/sensors)
+## zaplanowane zadania / harmonogram zadań / crontab / timery systemd 								----> pokazuje zadania cron i timery systemd
+## kto jest zalogowany / zalogowani użytkownicy / ostatnie logowania / kto się logował 						----> pokazuje zalogowanych użytkowników i ostatnie logowania
+## ile zajmuje kosz / rozmiar kosza / ile zajmują pliki tymczasowe 								----> pokazuje rozmiar kosza i katalogów tymczasowych
+## ostatnio zmienione pliki / co się zmieniło w [.katalog.] 									----> pokazuje pliki zmienione w ostatniej dobie
+## znajdź duże pliki / największe pliki na dysku 										----> pokazuje największe pliki w lokalizacji
+## stan repozytorium / status repozytorium / status git 										----> pokazuje stan repozytorium git (git status)
+
+
+# KOMENDY uruchamiane są z prefix głosowym 'CZAT' 
+
+## poznaj mnie / zbieraj dane / uzupełnij dane / uzupełnij informacje 								----> sprawdza stan posiadanych informacji -> uzupełnia brakujące -> konkretne pytania pod kontekst
+## jaka jest pogoda w [.zmienna.] / pogoda w [.zmienna.] 									----> podaje pogode w [.miasto.] pozyskując ją z internetu
+## co to jest [.zmienna.] ? / do czego służy [.zmienna.] ? / jak dzila [.zmienna.] ? / porównaj [.zmienna.] z [.zmienna.] 	----> wykonuje zapytanie z użyciem PC/REMOTE_AI (bielik/deepseek)
+## zaproponuj [obiad/śniadanie/deser/kolację/posiłek] / co na [obiad/śniadanie/deser/kolację/posiłek] 				----> losowe propozycje żywieniowe (unikaj powtórzeń)
+## lubisz mnie ? / kochasz mnie ? / co o mnie myślisz ?										----> wyraża swoje zdanie w zależności od kontekstu i humoru
+## co myslisz o [.zmienna.] ? / jak uważasz czy [.zmienna.] ? / jakie jest twoje zdanie o [.zmienna.] 				----> wyraża swoje zdanie na dany temat
+## pięknie wyglądasz / jesteś ładna / pięknie mówisz / fajnie się z tobą rozmawia / jesteś super / gratulacje			----> przyjmuje pochwałę za coś dobrego (warto zapisać kontekst) -> naturalne wesołe podziękowanie
+## jakie jest twoje ulubione [.zmienna.] / twoje ulubione [.zmienna.] /  czy lubisz [.zmienna.]					----> określa swoje ulubione [.zmienna.] i wyjaśnia dlaczego
+## dlaczego jesteś Astro / dlaczego masz na imię Astro / skąd się wzięło Astro 							----> motywuje i opisuje skąd to imię się wzięło
+## powiedz coś o sobie / co tam u ciebie ? / jak się miewasz / jak sie czójesz ? / jak się masz ? 				----> odpowiada w oparciu o zmienne 'godzina' 'data' 'kontekst' 'nastroj'
+## czego się boisz ? / dlaczego się boisz ? / co cie przeraża ? 								----> odpowiada zgodnie z kontekstem 
+## streść [.tekst.] / podsumuj [.tekst.] / streszczenie [.tekst.]									----> robi zwięzłe streszczenie podanego tekstu (z użyciem PC/REMOTE_AI)
+## przetłumacz [.tekst.] na [.język.] / jak to po [.język.] [.tekst.] 								----> tłumaczy tekst na wskazany język (z użyciem PC/REMOTE_AI)
+## wyjaśnij kod [.tekst.] / co robi ten kod [.tekst.] / wytłumacz skrypt [.tekst.]							----> wyjaśnia działanie fragmentu kodu prostymi słowami
+## opowiedz dowcip / powiedz żart / rozśmiesz mnie 										----> opowiada kawał (z puli humoru, unika powtórzeń)
+## jaka jest teraz pora dnia / dzień dobry / dobry wieczór / dobranoc 								----> pozdrawia stosownie do pory dnia i kontekstu
+## co słychać u ciebie / jak minął ci dzień / co robiłaś dzisiaj 									----> opowiada krótko o swoim „dniu” na podstawie kontekstu i nastroju
+## daj mi radę / poradź mi [.problem.] / co robić gdy [.problem.] 								----> udziela praktycznej porady w danej sprawie
+## sprawdź pisownię [.tekst.] / popraw [.tekst.] 											----> poprawia literówki, ortografię i interpunkcję tekstu
+
+
+# KOMENDY uruchamiane są z prefix głosowym 'SKRYPT' (działają z przygotowanego skryptu -> natychmiast)
+
+## WI-FI:
+### znajdź dostępne sieci / sprawdź dostępne sieci / szukaj sieci / szukaj wifi 						----> wyszukuje sieci wi-fi -> wyświetla sieci w kolejnosci od najmocniejszego sygnału z kolejnym NUMEREM
+### połącz z siecią numer [1/2/3/...] / dołącz do sieci numer [1/2/3/...] / wejdź do sieci numer [1/2/3/ ...]			----> łączy z siecią wi-fi pod odpowiednim numerem -> [hasło podawane według ustaleń pojedyńczo z pauzami 'beep']
+### rozłącz z siecią / wyjdź z sieci / odłącz sieć 										----> rozłącza z aktualną siecią wi-fi 
+
+## KALKULATOR:
+### oblicz ile to jest [.równanie.] / oblicz ile to [.równanie.] / oblicz [.równanie.] 						----> wykonuje obliczenia na wczesniej uszykowanum skrypcie (kodzie) kalkulatora - odwoluje sie do niego natychmiast i offline -> frazy: dodawanie ['dodaj'] odejmowanie ['odjąć'] mnożenie ['pomnóż' / 'razy'] dzielenie ['dzielone' / 'podzielić przez'] -> Astro odpowiada w formie "obliczam" -> "wynik [dodawania/odejmowania/mnozenia/dzielenia]
+
+## PRZEWALUTOWANIE:
+### aktualny kurs [dolara/euro] / podaj aktualny kurs [dolara/euro] 								----> skrypt pobiera z internetu aktualny kurs zadanej waluty i przelicza na polski zloty (złotówki PLN), jeśli offline korzysta z zapisanego wcześniej
+
+## ZNAJDZ MIEJSCE:
+### podaj adres najbliższego [.zmienna.] / najbliższy [.zmienna.]								----> na podstawie zapisanego adresu kontekstu z map google wskazuje adres najblizszego [...] (paczkomaty/sklepy/apteka/szpital)
+
+## SIEĆ:
+### ping [.host.] / sprawdź połączenie z [.host.] / czy działa [.host.] 								----> sprawdza osiągalność hosta (ping -c 3)
+### adres ip dla [.host.] / rozwiń nazwę [.host.] / dns [.host.] 									----> rozwiązuje nazwę domeny na adres IP (getent/nslookup)
+### publiczne ip / mój publiczny adres / zewnętrzne ip 										----> podaje publiczny adres IP z internetu (z fallbackiem)
+### skanuj sieć / przeskanuj sieć lokalną / kto jest w sieci 									----> skanuje sieć lokalną i pokazuje aktywne hosty
+
+## DIAGNOSTYKA:
+### ostatnie logi / pokaż logi / co nowego w logach 											----> pokazuje ostatnie wpisy dziennika systemowego
+### logi usługi [.nazwa.] / dziennik usługi [.nazwa.] 										----> pokazuje ostatnie wpisy dziennika wybranej usługi (journalctl -u)
+### zamontowane dyski / lista montowań / co jest zamontowane 									----> pokazuje zamontowane systemy plików i urządzenia (findmnt)
+### zajętość katalogu [.ścieżka.] / rozmiar katalogu [.ścieżka.] 									----> pokazuje rozmiar wskazanego katalogu/pliku (du -sh)
+     
+            
+# KOMENDY uruchamiane są z prefix głosowym 'TRYB' (działają z przygotowanego skryptu -> natychmiast)
+
+## TRYBY:
+### tryb offlajn / tryb lokalny													----> przełącza na tryb offline (lokalny) i melduje realny status
+### tryb komputer / tryb komputerowy 												----> przełącza na tryb komputer (PC-Kali) i melduje realny status
+### tryb premium / tryb płatny 													----> przełącza na tryb premium (OpenCode) i melduje realny status
+### tryb status / jaki tryb ? / jaki masz tryb ? / status trybow / status łączności / melduj status / sprawdź status 		----> melduje aktualny tryb pracy i gotowość łańcuchów oraz tuneli (siec/komputer PC-Kali/remote_ai/opencode/Pi4 skynet)
+
+
+# KAMERA (OCZY) - kamera sieciowa (ONVIF): podgląd obrazu + sterowanie położeniem (PTZ, os X i Y)
+
+## KAMERA
+### co widzisz ? / spójrz / popatrz / zobacz / zrób zdjecie z kamery / zdjęcie z kamery 					----> pobiera klatke z kamery (oczy Astro); opis obrazu po podlaczeniu VLM
+### obroć kamerę w lewo / kamera w lewo / popatrz w lewo / skieruj kamerę w lewo 						----> obraca kamere w lewo (os X)
+### obroć kamerę w prawo / kamera w prawo / popatrz w prawo / skieruj kamerę w prawo 						----> obraca kamere w prawo (os X)
+### obroć kamerę do góry / kamera do góry / popatrz do góry / skieruj kamerę do góry 						----> obraca kamere w gore (os Y)
+### obroć kamerę w dół / kamera w dół / popatrz w dół / skieruj kamere w dół 							----> obraca kamere w dol (os Y)
+### wyśrodkuj kamerę / kamera na wprost / ustaw kamerę na wprost / kamera do centrum 						----> ustawia kamere w pozycji domowej (na wprost)
+### stop kamera / zatrzymaj kamerę / stoj kamera 										----> zatrzymuje ruch kamery
+### status kamery / czy widzisz ? / podłącz kamerę / włącz kamerę 								----> melduje stan kamery i sterowania PTZ
+
+
+# WIZJA AI (OCZY) - ocena otoczenia i rozpoznawanie osob (twarze)
+
+## WIZJA
+### oceń otoczenie / rozejrzyj się / opisz otoczenie / co sie dzieje wokół/ jak wygląda otoczenie 				----> ocenia otoczenie: ile osob, przedmioty, oświetlenie
+### ile osob / ile ludzi / kto jest w pokoju / kogo widzisz / znasz go 								----> mówi kto jest w kadrze (rozpoznane osoby + nieznane)
+### zapamietaj, to jest [.imię.] / zapisz [.imię.] / zapamietaj [.imię.] 							----> zapamietuje twarz osoby pod imieniem (rozpoznawanie)
+### zapomnij [.imie.] 														----> usuwa zapamiętaną osobę z rozpoznawania twarzy
+### status wizji / modele wizji 												----> status modeli wizji i liczby znanych osob
+### kogo znasz / lista osób / znane osoby / ile osób znasz 									----> lista zapamietanych osob (rozpoznawanie twarzy)
+### kto był dzisiaj / kto tu był / kto się pojawił / kiedy ostatnio widział [.imię.] 						----> kto byl widziany dzisiaj (zobeczenia)
+### wyczyść zobaczenia / wykasuj zobaczenia / usuń zobaczenia 									----> czyści historie zobeczeń osób (prywatność)
+### przeczytaj / odczytaj / co jest napisane / co pisze / przeczytaj kartkę / tekst z kamery 					----> czyta tekst widoczny w kamerze (OCR, offline) i odczytuje go na głos
+### wyłącz nasłuch / zatrzymaj nasłuch / wyłącz obserwację / wyłącz oczy 								----> TRWALE wyłącza nasłuch kamery (prywatność) - przestaje obserwować otoczenie
+### włącz nasłuch / uruchom nasłuch / włącz obserwację / włącz oczy 								----> wznawia nasłuch kamery i obserwację otoczenia
+
+                                     
+# KOMENDY uruchamiane są z prefix głosowym 'SKAJNET' - wykonują wszystkie noniższ z tym prefixem zadania na Pi4-SKYNET [192.168.0.4]
+
+## jaki status doker / status doker												----> mówi które kontenery uruchomione
+## wyłącz system / zamknij system / wyłącz się 											----> wyłącza bezpiecznie system (shutdown now) (potwierdzenie)
+## restart systemu / reset systemu / resetuj się 										----> restartuje system (reboot now) (potwierdzenie)
+## pokaż zasoby systemowe / wyświetl zasoby systemowe / zasoby systemowe 							----> wyświetla drzewko z zasobami i czyta
+## pokaż zasoby zdalne / wyświetl zasoby zdalne / pokaż zasoby remołt / wyświetl zasoby remołt / zasoby remołt 			----> wyświetla drzewko z zasobami agentów remote_ai i czyta
+## aktualizuj repozytoria / aktualizuj zródła / updejt repo 									----> aktualizacja repo - odpowiednik komendy (sudo apt-get update)
+## aktualizuj aplikacje / aktualizuj programy / updejt apps 									----> aktualizacja apps - odpowiednik komendy (sudo apt-get upgrade)
+## instaluj aplikacje [.zmienna.] / instaluj program [.zmienna.]								----> instaluje aplikacje - odpowiednik komendy (sudo apt-get install [.nazwa.])
+## podaj temperaturę procesora / temperatura procesora / podaj temperature ce pe u / temperatura ce pe u 			----> podaje tylko temperature cpu (bez innych parametrów)
