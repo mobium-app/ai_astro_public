@@ -11,6 +11,10 @@ knowledge/web/
 knowledge/hnsw/
 *.env
 !config/machines.env
+# Sekrety nigdy w repo (token/secret mobility, klucze API) — 600, w .gitignore od 2026-10-01.
+secrets/
+*.secret
+*.token
 *.log
 # Backupy datasetów (duże, lokalne) — nie trzymamy w repozytorium (E4, 2026-09-26).
 datasets_backup*/
