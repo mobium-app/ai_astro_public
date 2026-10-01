@@ -1,12 +1,13 @@
 """Testy M0 mobility — REST backend dla apki Astro Mobilne (bez LLM/audio; mock backendu)."""
 
 import hashlib
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-from astro.mobility import chat
+from astro.mobility import chat, knowledge
 from astro.mobility.auth import check_token
 from astro.mobility.server import create_app
 from astro.mobility.store import MobilityStore
@@ -110,6 +111,80 @@ class TestRemember(MobilityTestCase):
         self.post("/remember", {"id": "n1", "content": '{"text":"kup mleko"}'})
         due = self.get("/remember?due=1").get_json()
         self.assertTrue(any(i["id"] == "n1" for i in due["items"]))
+
+
+def _make_learned_db(path: Path) -> None:
+    """Mini baza `learned` — schema zgodna z memory.store."""
+    conn = sqlite3.connect(path)
+    conn.execute(
+        "CREATE TABLE learned (id INTEGER PRIMARY KEY, ts REAL, topic TEXT, title TEXT, "
+        "text TEXT, source TEXT, verified INTEGER, confidence REAL, url TEXT, qkey TEXT)")
+    rows = [
+        (1, "fakt", "stolica polski", "Stolica Polski to Warszawa.", "facts"),
+        (2, "fakt", "stolica francji", "Stolica Francji to Paryz.", "facts"),
+        (3, "obyczajowe", "dzien dobry", "Dzien dobry! Milo mi Ciebie slychec.", "bielik"),
+        (4, "smieci", "urwane", "Odpowiedz ucina sie w polowie zdania...", "remote"),
+    ]
+    conn.executemany(
+        "INSERT INTO learned(id, ts, topic, title, text, source) VALUES(?,0,?,?,?,?)", rows)
+    conn.commit()
+    conn.close()
+
+
+class TestKnowledge(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.db = Path(self._tmp.name) / "memory.db"
+        _make_learned_db(self.db)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_pack_skips_truncated(self):
+        items = knowledge.pack(self.db)
+        self.assertEqual([i["id"] for i in items], [1, 2, 3])
+        self.assertEqual(items[0]["q"], "stolica polski")
+        self.assertEqual(items[0]["a"], "Stolica Polski to Warszawa.")
+
+    def test_latest_id_and_delta(self):
+        self.assertEqual(knowledge.latest_id(self.db), 4)
+        self.assertEqual([i["id"] for i in knowledge.delta(self.db, 2)], [3])
+
+    def test_delta_since_zero_is_pack(self):
+        self.assertEqual(knowledge.delta(self.db, 0, 10), knowledge.pack(self.db)[:10])
+
+    def test_missing_db_is_empty(self):
+        brak = Path(self._tmp.name) / "nie_ma.db"
+        self.assertEqual(knowledge.pack(brak), [])
+        self.assertEqual(knowledge.delta(brak, 5), [])
+        self.assertEqual(knowledge.latest_id(brak), 0)
+
+    def test_context_returns_knowledge_delta(self):
+        self._tmp2 = tempfile.TemporaryDirectory()
+        app = create_app(db_path=Path(self._tmp2.name) / "m.db", token=TOKEN,
+                         knowledge_db=self.db)
+        app.config["TESTING"] = True
+        try:
+            client = app.test_client()
+            auth = {"Authorization": f"Bearer {SECRET}"}
+            # domyślnie (bez parametru `knowledge`) — regresja: Flask zwraca default
+            # bez konwersji type, więc wiedza musi i tak być włączona
+            body = client.get("/context", headers=auth).get_json()
+            self.assertEqual([i["id"] for i in body["knowledge_delta"]], [1, 2, 3])
+            self.assertEqual(body["knowledge_latest"], 4)
+            body1 = client.get("/context?knowledge=1", headers=auth).get_json()
+            self.assertEqual([i["id"] for i in body1["knowledge_delta"]], [1, 2, 3])
+            d = client.get("/context?kdelta=2", headers=auth).get_json()
+            self.assertEqual([i["id"] for i in d["knowledge_delta"]], [3])
+            for off in ("0", "false"):
+                none = client.get(f"/context?knowledge={off}", headers=auth).get_json()
+                self.assertNotIn("knowledge_delta", none)
+            pack = client.get("/knowledge", headers=auth).get_json()
+            self.assertEqual(pack["count"], 3)
+            self.assertEqual(pack["knowledge_latest"], 4)
+        finally:
+            app.config["STORE"].close()
+            self._tmp2.cleanup()
 
 
 class TestChat(MobilityTestCase):

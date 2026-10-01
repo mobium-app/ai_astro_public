@@ -13,12 +13,13 @@ from pathlib import Path
 
 from flask import Flask, jsonify, request
 
-from . import chat
+from . import chat, knowledge
 from .auth import check_token, load_token
 from .store import MobilityStore
 
 DB_PATH = Path(__file__).resolve().parents[1] / "data" / "mobility.db"
-APP_VERSION = "0.1.0"
+KNOWLEDGE_DB = knowledge.DEFAULT_DB
+APP_VERSION = "0.2.0"
 
 
 def tailscale_ip() -> str | None:
@@ -30,10 +31,12 @@ def tailscale_ip() -> str | None:
         return None
 
 
-def create_app(db_path: Path = DB_PATH, token: str | None = None) -> Flask:
+def create_app(db_path: Path = DB_PATH, token: str | None = None,
+               knowledge_db: Path = KNOWLEDGE_DB) -> Flask:
     app = Flask(__name__)
     app.config["STORE"] = MobilityStore(db_path)
     app.config["TOKEN"] = token or load_token()
+    app.config["KNOWLEDGE_DB"] = knowledge_db
 
     def authorized() -> bool:
         return check_token(request.headers.get("Authorization"),
@@ -62,10 +65,19 @@ def create_app(db_path: Path = DB_PATH, token: str | None = None) -> Flask:
     def context():
         since = request.args.get("since", default=0, type=int)
         limit = min(request.args.get("limit", default=100, type=int), 500)
+        # Uwaga: Flask zwraca `default` BEZ konwersji `type` (zostaje string),
+        # więc `get(..., "1", type=int) == 1` daje Fałsz. Parsujemy jawnie.
+        want_knowledge = str(request.args.get("knowledge", "1")).lower() not in ("0", "false", "")
+        kdelta = request.args.get("kdelta", default=0, type=int)
         store: MobilityStore = app.config["STORE"]
-        return jsonify({"records": store.records_since(since, limit),
-                        "knowledge_delta": [],
-                        "server_version": store.server_version()})
+        payload = {"records": store.records_since(since, limit),
+                   "server_version": store.server_version()}
+        if want_knowledge:
+            items = knowledge.delta(app.config["KNOWLEDGE_DB"], since=kdelta or since,
+                                    limit=limit)
+            payload["knowledge_delta"] = items
+            payload["knowledge_latest"] = knowledge.latest_id(app.config["KNOWLEDGE_DB"])
+        return jsonify(payload)
 
     @app.post("/episodes")
     @app.post("/lessons")
@@ -102,6 +114,16 @@ def create_app(db_path: Path = DB_PATH, token: str | None = None) -> Flask:
     def due_reminders():
         store: MobilityStore = app.config["STORE"]
         return jsonify({"items": store.due_reminders()})
+
+    @app.get("/knowledge")
+    def knowledge_pack():
+        """Paczka wiedzy (ręczne wgranie na telefon) — `?limit=` i `?since=`."""
+        since = request.args.get("since", default=0, type=int)
+        limit = min(request.args.get("limit", default=20000, type=int), 50000)
+        db = app.config["KNOWLEDGE_DB"]
+        items = knowledge.pack(db) if since <= 0 else knowledge.delta(db, since, limit)
+        return jsonify({"count": len(items), "knowledge_latest": knowledge.latest_id(db),
+                        "items": items})
 
     @app.post("/chat")
     def chat_endpoint():
