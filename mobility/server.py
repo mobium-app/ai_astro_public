@@ -11,9 +11,9 @@ import sys
 import time
 from pathlib import Path
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
-from . import chat, knowledge
+from . import chat, knowledge, setup
 from .auth import check_token, load_token
 from .store import MobilityStore
 
@@ -50,7 +50,7 @@ def create_app(db_path: Path = DB_PATH, token: str | None = None,
     def _auth():
         if request.method == "OPTIONS":
             return "", 204
-        if request.path in ("/health",):
+        if request.path in ("/health",) or request.path.startswith("/setup"):
             return None
         return require_auth()
 
@@ -78,6 +78,35 @@ def create_app(db_path: Path = DB_PATH, token: str | None = None,
             payload["knowledge_delta"] = items
             payload["knowledge_latest"] = knowledge.latest_id(app.config["KNOWLEDGE_DB"])
         return jsonify(payload)
+
+    @app.get("/setup")
+    def setup_info():
+        key = request.args.get("key", "")
+        if not key or key != setup.pairing_key():
+            return jsonify({"error": "bad pairing key"}), 403
+        return jsonify(setup.setup_payload())
+
+    @app.get("/setup/voice")
+    def setup_voice():
+        key = request.args.get("key", "")
+        if not key or key != setup.pairing_key():
+            return jsonify({"error": "bad pairing key"}), 403
+        if not setup.VOICE_ONNX.exists():
+            return jsonify({"error": "voice model missing"}), 404
+        return send_file(setup.VOICE_ONNX, mimetype="application/octet-stream",
+                         as_attachment=True,
+                         download_name=setup.VOICE_ONNX.name)
+
+    @app.get("/setup/voice-config")
+    def setup_voice_config():
+        key = request.args.get("key", "")
+        if not key or key != setup.pairing_key():
+            return jsonify({"error": "bad pairing key"}), 403
+        if not setup.VOICE_JSON.exists():
+            return jsonify({"error": "voice config missing"}), 404
+        return send_file(setup.VOICE_JSON, mimetype="application/json",
+                         as_attachment=True,
+                         download_name=setup.VOICE_JSON.name)
 
     @app.post("/episodes")
     @app.post("/lessons")
