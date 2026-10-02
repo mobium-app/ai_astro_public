@@ -46,6 +46,9 @@ def main():
                     help="ułamek rekordów czatu DOŁĄCZONY do treningu narzędzi (0..1; np. 0.08 "
                          "= 8%% czatu przy tool-only). Zabija artefakt `<tool_call>` w rozmowie "
                          "bez dławienia tool-callingu (wniosek tools-r1, 2026-09-30)")
+    ap.add_argument("--chat-limit", type=int, default=None,
+                    help="maks. liczba rekordów CZATU w treningu (balans torów; walidacja "
+                         "zostaje reprezentatywna). Bez wartości = bez przycinania.")
     args = ap.parse_args()
 
     tr = load(os.path.join(src, "astro_train.jsonl"))
@@ -53,6 +56,12 @@ def main():
     if getattr(args, "only_chat", False):     # adapter CZATU: tylko rekordy bez narzędzi
         tr = [r for r in tr if is_chat(r)]
         va = [r for r in va if is_chat(r)]
+    elif args.chat_limit is not None:         # balans torów: przytnij czat w TRENINGU
+        chat_rows = [r for r in tr if is_chat(r)]
+        if args.chat_limit < len(chat_rows):
+            random.Random(42).shuffle(chat_rows)
+            keep = chat_rows[:args.chat_limit]
+            tr = [r for r in tr if not is_chat(r)] + keep
     elif args.chat_weight <= 0:               # 0 = całkowicie pomiń rekordy czatu (tool-only)
         chat_rows = [r for r in tr if is_chat(r)]
         keep = int(round(len(chat_rows) * args.chat_frac)) if args.chat_frac > 0 else 0
