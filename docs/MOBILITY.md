@@ -54,6 +54,11 @@ Eksport tabeli `learned` (16 578 wpisów → ~16 577 po odsianiu, ~7,7 MB JSON) 
 * **odpowiedzi ucięte** (kończące się `…`) pomijane — telefon nie ma narzędzi do czyszczenia,
 * `delta(since)` po `id` — koszt rzędu milisekund (indeks po `id`).
 
+Stały bank Q&A (`source='qa_baza'`, 1007 wpisów z `qa_baza_wiedzy.json` — 10 kategorii)
+można wyeksportować jako plik paczki `data/knowledge_bank.json`:
+`knowledge.export_bank(...)` (ten sam format `{id, q, a, topic, source}`, bez wektorów,
+`latest_id` w nagłówku) — telefon wgrywa bank offline, a świeże wpisy idą przez `?kdelta=`.
+
 ## Testy
 
 `tests/test_mobility.py` (16 testów, `unittest` — wliczane przez `tests/run_tests.py`):

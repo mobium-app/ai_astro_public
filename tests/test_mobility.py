@@ -1,6 +1,7 @@
 """Testy M0 mobility — REST backend dla apki Astro Mobilne (bez LLM/audio; mock backendu)."""
 
 import hashlib
+import json
 import sqlite3
 import tempfile
 import unittest
@@ -131,6 +132,26 @@ def _make_learned_db(path: Path) -> None:
     conn.close()
 
 
+def _make_bank_db(path: Path) -> None:
+    """Mini baza `learned` z wpisami banku Q&A (source='qa_baza')."""
+    conn = sqlite3.connect(path)
+    conn.execute(
+        "CREATE TABLE learned (id INTEGER PRIMARY KEY, ts REAL, topic TEXT, title TEXT, "
+        "text TEXT, source TEXT, verified INTEGER, confidence REAL, url TEXT, qkey TEXT)")
+    rows = [
+        (11, "1. Medycyna i Zdrowie / Aparaty i układy", "Co to jest układ krążenia?",
+         "Układ krążenia to system naczyń krwionośnych odp. transport.", "qa_baza"),
+        (12, "1. Medycyna i Zdrowie / Aparaty i układy", "Co to jest homeostaza?",
+         "Homeostaza to zdolność organizmu do utrzymywania warunków.", "qa_baza"),
+        (13, "fakt", "stolica polski", "Stolicą Polski jest Warszawa.", "facts"),
+        (14, "smieci", "urwane z banku", "Odpowiedz ucina sie w polowie...", "qa_baza"),
+    ]
+    conn.executemany(
+        "INSERT INTO learned(id, ts, topic, title, text, source) VALUES(?,0,?,?,?,?)", rows)
+    conn.commit()
+    conn.close()
+
+
 class TestKnowledge(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -185,6 +206,45 @@ class TestKnowledge(unittest.TestCase):
         finally:
             app.config["STORE"].close()
             self._tmp2.cleanup()
+
+
+class TestKnowledgeBank(unittest.TestCase):
+    """Eksport banku Q&A (source='qa_baza') jako paczka — `data/knowledge_bank.json`."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.db = Path(self._tmp.name) / "memory.db"
+        _make_bank_db(self.db)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_export_bank_pack(self):
+        out = Path(self._tmp.name) / "knowledge_bank.json"
+        n = knowledge.export_bank(out, self.db)
+        self.assertEqual(n, 2)
+        data = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(data["count"], 2)
+        self.assertEqual(data["latest_id"], 12)  # max id banku (13 to nie bank)
+        self.assertEqual([i["id"] for i in data["items"]], [11, 12])
+        self.assertEqual(data["items"][0]["q"], "Co to jest układ krążenia?")
+        self.assertEqual(data["items"][0]["a"], "Układ krążenia to system naczyń krwionośnych odp. transport.")
+        self.assertEqual(data["items"][0]["topic"],
+                         "1. Medycyna i Zdrowie / Aparaty i układy")
+        self.assertTrue(all(i["source"] == "qa_baza" for i in data["items"]))
+        # delta po `id` względem `latest_id` (kontrakt dla telefonu)
+        self.assertEqual([i["id"] for i in data["items"] if i["id"] > 11], [12])
+
+    def test_export_bank_skips_truncated_and_non_bank(self):
+        out = Path(self._tmp.name) / "knowledge_bank.json"
+        knowledge.export_bank(out, self.db)
+        data = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual([i["id"] for i in data["items"]], [11, 12])  # bez 13 (facts), 14 (urwane)
+
+    def test_export_bank_missing_db(self):
+        out = Path(self._tmp.name) / "knowledge_bank.json"
+        self.assertEqual(knowledge.export_bank(out, Path(self._tmp.name) / "brak.db"), 0)
+        self.assertFalse(out.exists())
 
 
 class TestChat(MobilityTestCase):

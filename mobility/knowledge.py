@@ -131,3 +131,51 @@ def write_pack(out_path: str | Path, db_path: str | Path = DEFAULT_DB) -> int:
         "items": items,
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     return len(items)
+
+
+def export_bank(out_path: str | Path, db_path: str | Path = DEFAULT_DB,
+                source: str = "qa_baza") -> int:
+    """Eksport banku Q&A (stała wiedza bazowa) jako paczka JSON do pliku.
+
+    Wybiera wyłącznie wpisy o zadanym `source` (domyślnie `qa_baza` — bank
+    1020+ Q&A zaingestowany przez `scripts/ingest_qa.py`). Format pliku taki
+    sam jak `write_pack` — `{generated_at, latest_id, count, items}` z itemami
+    `{id, q, a, topic, source}` (kształt zgodny z `learned`), bez wektorów.
+
+    Delta: telefon liczy ją lokalnie po `id` względem `latest_id` albo pobiera
+    przez `GET /context?kdelta=` (serwer). Brak bazy = 0 wpisów, plik nie
+    powstaje. Zwraca liczbę zapisanych wpisów.
+    """
+    conn = open_db(db_path)
+    if conn is None:
+        return 0
+    items: list[dict] = []
+    try:
+        rows = conn.execute(
+            "SELECT id, title, text, topic, source FROM learned "
+            "WHERE source = ? AND text IS NOT NULL AND LENGTH(text) > ? "
+            "ORDER BY id", (source, MIN_ANSWER_CHARS))
+        for r in rows:
+            text = (r["text"] or "").strip()
+            if _looks_truncated(text):
+                continue
+            items.append({
+                "id": r["id"],
+                "q": (r["title"] or "").strip(),
+                "a": text[:MAX_ANSWER_CHARS],
+                "topic": r["topic"] or "",
+                "source": r["source"] or "",
+            })
+    finally:
+        conn.close()
+    if not items:
+        return 0
+    path = Path(out_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "latest_id": items[-1]["id"],
+        "count": len(items),
+        "items": items,
+    }, ensure_ascii=False, indent=1), encoding="utf-8")
+    return len(items)
