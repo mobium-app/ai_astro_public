@@ -111,7 +111,11 @@ class TestNpuBackend(unittest.TestCase):
 class TestPolicyNpu(unittest.TestCase):
     def test_chat_quality_first_with_npu_optin(self):
         reg = B.BackendRegistry()
-        reg.register(B.CpuBackend("http://127.0.0.1:11434", "m"))
+        cpu = B.CpuBackend("http://127.0.0.1:11434", "m")
+        # Hermetyczność (CI bez lokalnej Ollamy, 2026-10-03): backend cpu musi być „ready",
+        # inaczej wybór spada na npu i test mierzy środowisko zamiast polityki NPU_CHAT.
+        cpu.ready = lambda: True
+        reg.register(cpu)
         npu = B.NpuBackend(engine=object())
         npu.ready = lambda: True
         reg.register(npu)

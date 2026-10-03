@@ -97,6 +97,9 @@ class TestVisionCamera(unittest.TestCase):
 
     def test_capture_frame_uses_ffmpeg(self):
         patches = self._patch()
+        # CI nie ma ffmpeg w obrazie (2026-10-03) — mockujemy wykrycie, żeby test mierzył
+        # logikę capture_frame, a nie dostępność binarki.
+        patches.append(mock.patch("shutil.which", return_value="/usr/bin/ffmpeg"))
         for p in patches:
             p.start()
         try:
@@ -182,8 +185,11 @@ class TestCameraToolsAndCommands(unittest.TestCase):
 
 class TestVlmBackend(unittest.TestCase):
     def test_off_when_nothing_configured(self):
+        # vlm_ready() = premium-vision (tryb premium+klucze) LUB VLM_MODEL LUB hailo (2026-10-03);
+        # w tym teście wyłączamy świadomie wszystkie trzy ścieżki.
         with mock.patch.object(config, "VLM_HAILO", False), \
-             mock.patch.object(config, "VLM_MODEL", ""):
+             mock.patch.object(config, "VLM_MODEL", ""), \
+             mock.patch.object(vision, "_premium_vision_ready", return_value=False):
             self.assertEqual(vision.vlm_backend(), "off")
             self.assertFalse(vision.vlm_ready())
 
@@ -282,6 +288,8 @@ class TestMultiCamera(unittest.TestCase):
 
     def test_capture_frame_uses_selected_source(self):
         patches = self._patch("ogrod=rtsp://192.168.0.247:554/live/ch0")
+        # CI nie ma ffmpeg (2026-10-03) — mock wykrycia binarki.
+        patches.append(mock.patch("shutil.which", return_value="/usr/bin/ffmpeg"))
         for p in patches:
             p.start()
         try:

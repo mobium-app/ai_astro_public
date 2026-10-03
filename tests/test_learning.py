@@ -177,7 +177,10 @@ class TestPlanCache(unittest.TestCase):
         goal = "zainstaluj i skonfiguruj nginx na serwerze"
         mem.record_plan_result(goal, [{"command": "apt-get install -y nginx"}], success=True)
         agent, backend = make_agent([B.BackendResult(text="Zrobione.")], mem)
-        out = dispatch(goal, agent, use_plan=True)
+        # Hermetyczność CI (2026-10-03): obrazy CI mają nginx preinstalowany, a walidacja
+        # odrzuca plan „zainstaluj X", gdy X już istnieje — mockujemy detekcję pakietu.
+        with mock.patch("astro.safety.plans.already_installed", return_value=False):
+            out = dispatch(goal, agent, use_plan=True)
         self.assertEqual(out.route, "plan-cache")
         self.assertIn("nginx", out.reply)
 

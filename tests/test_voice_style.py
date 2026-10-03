@@ -196,6 +196,8 @@ class TestGirlVoiceDefault(unittest.TestCase):
         self._patch.start()
         self.addCleanup(self._patch.stop)
 
+    @unittest.skipUnless(getattr(config, "TTS_MODEL", ""),
+                         "brak modelu TTS w tym środowisku (np. CI bez models/)")
     def test_default_model_is_gosia(self):
         self.assertIn("gosia", os.path.basename(getattr(config, "TTS_MODEL", "")))
 
@@ -207,6 +209,8 @@ class TestGirlVoiceDefault(unittest.TestCase):
         for label, _guidance, _pad in ANCHORS:
             self.assertIn("pitch 350", voice_style.fx_for(label), label)
 
+    @unittest.skipUnless(getattr(config, "TTS_MODEL", ""),
+                         "brak modelu TTS w tym środowisku (np. CI bez models/)")
     def test_tts_object_uses_girl_voice(self):
         t = TTS()
         self.assertIn("gosia", os.path.basename(t.model))

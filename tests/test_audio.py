@@ -5,6 +5,7 @@ import tempfile
 import types
 import unittest
 import wave
+from unittest import mock
 
 import numpy as np
 
@@ -103,12 +104,14 @@ class TestTTS(unittest.TestCase):
         self.assertIn("voice.onnx", cmd)
 
     def test_fx_chain(self):
-        tts = TTS(engine="piper", fx="pitch 200 chorus 0.6 0.9 50 0.4 0.25 2 -t echo 0.8 0.88 50 0.3")
-        argv = tts.fx_argv("in.wav", "out.wav")
-        self.assertIsNotNone(argv)
-        self.assertEqual(argv[:3], ["sox", "in.wav", "out.wav"])
-        self.assertIn("pitch", argv)
-        self.assertIsNone(TTS(engine="piper", fx="").fx_argv("in.wav", "out.wav"))
+        # CI nie ma sox w obrazie (2026-10-03) — mock wykrycia binarki; test mierzy składnię fx.
+        with mock.patch("shutil.which", return_value="/usr/bin/sox"):
+            tts = TTS(engine="piper", fx="pitch 200 chorus 0.6 0.9 50 0.4 0.25 2 -t echo 0.8 0.88 50 0.3")
+            argv = tts.fx_argv("in.wav", "out.wav")
+            self.assertIsNotNone(argv)
+            self.assertEqual(argv[:3], ["sox", "in.wav", "out.wav"])
+            self.assertIn("pitch", argv)
+            self.assertIsNone(TTS(engine="piper", fx="").fx_argv("in.wav", "out.wav"))
 
     def test_play_cmd(self):
         tts = TTS(engine="piper", player="aplay", device="plughw:CARD=wm8960,DEV=0")

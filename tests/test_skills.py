@@ -131,8 +131,10 @@ class TestSkillTools(unittest.TestCase):
         self.assertIn("potwierdzenia", res.text)
 
     def test_run_skill_tool_readonly(self):
+        # Ścieżka względem repo (nie ~/astro) — działa też w CI (2026-10-03).
         res = registry.execute("run_skill",
-                               {"name": "dir_size", "params": {"path": "~/astro/docs"}},
+                               {"name": "dir_size",
+                                "params": {"path": str(config.REPO / "docs")}},
                                make_ctx())
         self.assertTrue(res.ok)
 
