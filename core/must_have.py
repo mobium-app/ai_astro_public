@@ -99,6 +99,9 @@ _MODE_PREMIUM_RE = re.compile(
 _MODE_STATUS_RE = re.compile(
     r"\b(?:tryb\s+status|jaki\s+(?:masz\s+)?tryb|status\s+(?:trybow|lacznosci|polaczenia)|"
     r"melduj\s+status|sprawdz\s+status|stan\s+lacznosci)\b")
+# Raport łańcucha premium (monitoring): „premium status", „status premium".
+_PREMIUM_STATUS_RE = re.compile(
+    r"\b(?:premium\s+status|status\s+premium)\b")
 
 # --- kamera sieciowa = „oczy" ASTRO ----------------------------------------------------------
 # Sterowanie położeniem (PTZ) i podgląd. Determinizm: „obróć/popatrz + kierunek" = ruch; samo
@@ -416,6 +419,33 @@ def _mode_status():
         return line, "mode-status"
 
 
+def _premium_status():
+    """Raport łańcucha premium z monitoringu (runtime/premium_status.json). Bez modelu.
+
+    Czytany stan zapisuje cron (`scripts/premium_check.py`, co 10 min); gdy raportu
+    nie ma — mówi wprost, że monitoring jeszcze nie wystartował."""
+    import json as _json
+    import time as _time
+    from .. import config as _config
+
+    path = _config.RUNTIME_DIR / "premium_status.json"
+    try:
+        data = _json.loads(path.read_text(encoding="utf-8"))
+        items = data.get("items") or []
+        age = max(0, int(_time.time() - float(data.get("ts") or 0)))
+    except Exception:
+        return ("Nie mam jeszcze raportu monitoringu premium.", "premium-status")
+    parts = [f"{it.get('name', '?')} - {'OK' if it.get('ok') else 'BRAK'}" for it in items]
+    if age < 120:
+        when = "przed chwilą"
+    elif age < 3600:
+        when = f"{age // 60} min temu"
+    else:
+        when = f"{age // 3600} h temu"
+    return ("Łańcuch premium: " + ", ".join(parts) + f" (stan sprzed {when}).",
+            "premium-status")
+
+
 def _camera_move(direction, spec=None):
     """Obraca wybraną kamerę sieciową (PTZ) deterministycznie — bez modelu."""
     from ..tools import vision
@@ -592,6 +622,8 @@ def intent(text):
         return "mode-offline"
     if _MODE_KOMPUTER_RE.search(low):
         return "mode-komputer"
+    if _PREMIUM_STATUS_RE.search(low):
+        return "premium-status"
     if _MODE_PREMIUM_RE.search(low):
         return "mode-premium"
     if _MODE_STATUS_RE.search(low):
@@ -694,6 +726,8 @@ def handle(text, agent=None):
         return _set_mode(route)
     if route == "mode-status":
         return _mode_status()
+    if route == "premium-status":
+        return _premium_status()
     if route == "watch-off":
         from ..vision import privacy
         privacy.set_watch_off(True)

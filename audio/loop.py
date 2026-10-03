@@ -499,6 +499,33 @@ class VoiceLoop:
                 self._mic.close()
                 self._mic = None
 
+    def _flush_announcements(self):
+        """Komunikaty systemowe z kolejki (monitoring premium) — mów przy najbliższym wake.
+
+        `scripts/premium_check.py` dopisuje tu „Straciłam połączenie z …"/„… przywrócone";
+        konsumujemy max 3 zaległe wpisy i kasujemy plik kolejki."""
+        import json as _json
+        from .. import config as _config
+        q = _config.RUNTIME_DIR / "announce_queue.jsonl"
+        try:
+            lines = q.read_text(encoding="utf-8").strip().splitlines()
+        except Exception:
+            return []
+        notes = []
+        for ln in lines[-3:]:
+            try:
+                text = ((_json.loads(ln) or {}).get("text") or "").strip()
+            except Exception:
+                text = ""
+            if text:
+                notes.append(text)
+        if notes:
+            try:
+                q.unlink()
+            except Exception:
+                pass
+        return notes
+
     def _run_loop(self, max_turns=None):
         turns = 0
         while max_turns is None or turns < max_turns:
@@ -515,6 +542,11 @@ class VoiceLoop:
                 if not woke:
                     continue
                 self.log.info("wake „Hej Astro\" wykryty")
+                # Komunikaty systemowe (monitoring premium) — np. „straciłam połączenie z …".
+                for note in self._flush_announcements():
+                    self.log.info("alert systemowy: %s", note)
+                    self.say(note)
+                    signals.done_signal()
                 # Proaktywne, kontekstowe powitanie (pora dnia, imię, nastrój); fallback klasyczny.
                 greet = self.initiative.greeting(getattr(self.agent, "memory", None)) or "Melduję się"
                 self.say(greet)
