@@ -175,7 +175,50 @@ def camera_reachable(camera=None, timeout=1.5):
 
 
 def vlm_ready():
-    return bool(getattr(config, "VLM_MODEL", "")) or _hailo_vlm_ready()
+    return (_premium_vision_ready()
+            or bool(getattr(config, "VLM_MODEL", "")) or _hailo_vlm_ready())
+
+
+def _premium_vision_ready():
+    """Czy premium vision dostępny: tryb premium + klucze OpenCode Go (2026-10-03)."""
+    try:
+        from ..backends import modes
+        if modes.get_mode() != modes.PREMIUM:
+            return False
+        from .. import remote_support
+        return bool(remote_support.load_keys().get("opencode"))
+    except Exception:
+        return False
+
+
+def _vlm_caption_premium(frame_path, question=""):
+    """Opis klatki przez modele premium (OpenCode Go, multimodalny format OpenAI).
+
+    Wysyła zmniejszony JPEG (`_image_b64`, ~896 px) — mniej tokenów obrazu; modele darmowe
+    (space-bunny/longcat) mają vision. Pusty przy błędzie/nie-polskiej odpowiedzi."""
+    try:
+        from .. import remote_support
+    except Exception:
+        return ""
+    try:
+        b64 = _image_b64(frame_path)
+        if not b64:
+            return ""
+        prompt = question or (
+            "Opisz po polsku krótko (2-3 zdania), co widzisz na zdjęciu z kamery domowej: "
+            "główna scena, osoby i ich wygląd, przedmioty, nastrój/ekspresja jeśli widoczna.")
+        messages = [{"role": "user", "content": [
+            {"type": "text", "text": prompt},
+            {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}},
+        ]}]
+        res = remote_support.ask_full(messages, max_tokens=500, temperature=0.1,
+                                      chain=remote_support.opencode_chain())
+        if not res:
+            return ""
+        text = (res[0] or "").strip()
+        return text if _looks_polish(text) else ""
+    except Exception:
+        return ""
 
 
 def vlm_backend():
@@ -384,8 +427,17 @@ def assess_current(memory=None, objects=True, faces=True, camera=None):
     return frame, assess
 
 
+def describe_frame(frame_path, question=""):
+    """Publiczny opis klatki dla warstw wyżej (premium → lokalny fallback). 2026-10-03."""
+    return _vlm_caption(frame_path, question)
+
+
 def _vlm_caption(frame_path, question=""):
-    """Opis klatki wg preferencji (Ollama vs NPU), z fallbackiem. Pusty, gdy brak/błąd."""
+    """Opis klatki: w trybie premium — chmura (OC Go, vision), dalej lokalny fallback."""
+    if _premium_vision_ready():
+        text = _vlm_caption_premium(frame_path, question)
+        if text:
+            return text
     prefer = str(getattr(config, "VLM_PREFER", "ollama")).lower()
     order = ("hailo", "ollama") if prefer == "hailo" else ("ollama", "hailo")
     for backend in order:

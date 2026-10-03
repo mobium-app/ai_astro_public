@@ -494,8 +494,12 @@ def _camera_look(spec=None):
     frame = vision.capture_frame(camera=cam)
     if not frame:
         return "Kamera jest, ale nie mogę pobrać obrazu.", "camera-look"
+    # Opis klatki: w trybie premium — vision przez OpenCode Go (bunny), dalej lokalny VLM.
+    caption = vision.describe_frame(frame)
+    if caption:
+        return f"Patrzę na kamerę {cam['name']}: {caption}", "camera-look"
     if vision.vlm_ready():
-        return "Mam klatkę z kamery, ale opis obrazu nie jest jeszcze podłączony.", "camera-look"
+        return "Mam klatkę z kamery, ale nie udało się teraz opisać obrazu.", "camera-look"
     return ("Robię zdjęcie z kamery. Zapisane — opis obrazu dołożę, gdy podłączysz VLM.",
             "camera-look")
 
