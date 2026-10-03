@@ -60,12 +60,15 @@ REMOTE_TIMEOUT = int(_env("ASTRO_REMOTE_TIMEOUT", "120"))
 # `API`, `API.txt`), żeby brak rozszerzenia nie wyzerował całego łańcucha dostawców.
 def _api_file():
     explicit = os.environ.get("ASTRO_API_FILE", "")
-    if explicit:
+    # Fix 2026-10-03: env wskazujący nieistniejący plik (np. "API" zamiast "API.txt")
+    # zerował CAŁY łańcuch dostawców (tryb premium bez kluczy → cicho szedł na pc/cpu).
+    # Teraz: explicit honorujemy tylko gdy istnieje; inaczej szukamy obu znanych nazw.
+    if explicit and Path(explicit).is_file():
         return explicit
     for cand in ("/etc/astro-secrets/API", "/etc/astro-secrets/API.txt"):
         if Path(cand).is_file():
             return cand
-    return "/etc/astro-secrets/API"
+    return explicit or "/etc/astro-secrets/API"
 
 
 API_FILE = _api_file()
