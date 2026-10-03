@@ -204,6 +204,33 @@ class Agent:
         result = self.registry.execute(name, args, self.ctx)
         return name, result
 
+    def _learn_premium(self, text, reply, local_only):
+        """Nauka z premium (2026-10-03): odpowiedzi na pytania wiedzowe → `learned` (offline).
+
+        Warunki: ostatni backend = `premium`, to nie komenda (local_only), odpowiedź ma ≥ 80
+        znaków, wypowiedź klasyfikuje się jako pytanie (po zdjęciu prefiksu kanału).
+        Wyłączalne: `ASTRO_PREMIUM_LEARN=0`. Bramki jakości/dedup robi `memory.add_learned`.
+        """
+        import os as _os
+        if _os.environ.get("ASTRO_PREMIUM_LEARN", "1") == "0":
+            return
+        if local_only or not self.memory or not (reply or "").strip() or len(reply) < 80:
+            return
+        try:
+            last = getattr(self.backends, "last_choice", None)
+            if "premium" not in (getattr(last, "name", "") or ""):
+                return
+            from . import prefix as prefix_mod
+            _channel, body = prefix_mod.parse(text)
+            q = (body or text or "").strip()
+            from ..safety import quality
+            if not quality.pair_ok(q, reply):
+                return
+            self.memory.add_learned(topic="premium", title=(q or "")[:200], text=reply,
+                                    source="premium", confidence=0.55)
+        except Exception:
+            pass
+
     def run(self, text, force_chat=False):
         # `force_chat` (prefix „czat"): WYŁĄCZA narzędzia i traktuje wypowiedź jak rozmowę —
         # czat nigdy nie może wykonać komendy, nawet gdy brzmi jak zlecenie.
@@ -328,6 +355,8 @@ class Agent:
                         reply = fixed
                 except Exception:
                     pass
+            # Nauka z premium (2026-10-03): odpowiedź zdalna na pytanie wiedzowe -> `learned`.
+            self._learn_premium(text, reply, local_only)
             if self.memory:
                 try:
                     self.memory.add_episode(text, reply, used_tools, ok=True)
