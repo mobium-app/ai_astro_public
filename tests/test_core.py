@@ -76,7 +76,9 @@ class TestDispatch(unittest.TestCase):
         agent, backend, mem = make_agent([B.BackendResult(text="nieużywane")])
         out = dispatch("sprawdź temperaturę procesora i wolne miejsce na dysku", agent)
         self.assertEqual(out.route, "fast")
-        self.assertIn("°C", out.reply)
+        # Temperatura: „NN °C" na sprzęcie, „niedostępna" w VM/CI bez czujników (2026-10-03).
+        if "°C" not in out.reply:
+            self.assertIn("Temperatura CPU: niedostępna", out.reply)
         self.assertIn("GB", out.reply)
         self.assertEqual(backend.script, [B.BackendResult(text="nieużywane")])
 

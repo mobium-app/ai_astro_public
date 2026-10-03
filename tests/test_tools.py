@@ -67,7 +67,9 @@ class TestSystemInfo(unittest.TestCase):
     def test_system_info(self):
         res = registry.execute("system_info", {}, make_ctx())
         self.assertTrue(res.ok)
-        self.assertIn("°C", res.text)
+        # Temperatura: „NN °C" na sprzęcie, „niedostępna" w VM/CI bez czujników (2026-10-03).
+        if "°C" not in res.text:
+            self.assertIn("Temperatura CPU: niedostępna", res.text)
         self.assertIn("GB", res.text)
         self.assertTrue(res.data["disk_free_gb"] > 0)
 
