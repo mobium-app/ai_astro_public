@@ -85,6 +85,38 @@ DORMANT_ORDER = ["deepseek", "grok"]
 ACTIVE_ORDER = [name for name in PRIMARY_ORDER if name not in DORMANT_ORDER]
 OPENCODE = ("https://opencode.ai/zen/go/v1",
             os.environ.get("ASTRO_OPENCODE_MODEL", "deepseek-v4.1-flash"))
+# Modele DARMOWE OC Go dla trybu „premium" (eksperyment small-talk 2026-10-03), w kolejności
+# od najlepszego: space-bunny-free → longcat-2.5-preview-free → mimo-v2.6-flash-free (zapas).
+# Nadpisywalne `ASTRO_OPENCODE_MODELS="m1,m2,m3"`. Gdy model niedostępny, chain idzie dalej.
+OPENCODE_FREE_MODELS = [m.strip() for m in os.environ.get(
+    "ASTRO_OPENCODE_MODELS",
+    "space-bunny-free,longcat-2.5-preview-free,mimo-v2.6-flash-free",
+).split(",") if m.strip()]
+
+
+def opencode_session_id():
+    """Stały identyfikator sesji OpenCode (utrwalony) — kontekst bez zrywania między turami.
+
+    Bramka OC Go wymaga `x-opencode-session` (bez niego 400 MissingSessionID); stała wartość
+    daje ciągłość routingu i cache'u prefiksu między turami i restartami usługi
+    (do wyłączenia urządzenia). Plik: `runtime/opencode_session.json`.
+    """
+    path = config.RUNTIME_DIR / "opencode_session.json"
+    sid = ""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            sid = (json.load(fh) or {}).get("session", "")
+    except Exception:
+        sid = ""
+    if not sid:
+        sid = str(uuid.uuid4())
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with open(path, "w", encoding="utf-8") as fh:
+                json.dump({"session": sid, "created": time.time()}, fh)
+        except Exception:
+            pass
+    return sid
 
 _ALIASES = {
     "opencode": "opencode", "open code": "opencode", "astro": "opencode",
@@ -170,20 +202,26 @@ def provider_chain(path=None, include_pc=True):
     url, model = OPENCODE
     for i, key in enumerate(keys.get("opencode", []), 1):
         chain.append(Provider("opencode", url, model, key, timeout=config.REMOTE_TIMEOUT,
-                              headers={"x-opencode-session": str(uuid.uuid4())},
+                              headers={"x-opencode-session": opencode_session_id()},
                               account=f"opencode#{i}"))
     return chain
 
 
 def opencode_chain(path=None):
-    """Łańcuch WYŁĄCZNIE OpenCode Go (wszystkie konta) — dla trybu „premium".
+    """Łańcuch WYŁĄCZNIE OpenCode Go (tryb „premium") — darmowe modele small-talk w kolejności.
 
-    Tryb premium rozumuje w OpenCode/DeepSeek; lokalny fallback (PC/CPU) dokłada rejestr
-    backendów, więc ten łańcuch nie zawiera PC ani darmowych chmur."""
+    Kolejność modeli: `OPENCODE_FREE_MODELS` (space-bunny → longcat → mimo-zapas), każdy model
+    × wszystkie konta z API.txt. Wszystkie wpisy niosą STAŁY `x-opencode-session`
+    (`opencode_session_id`) — kontekst i cache prefiksu nie zrywają się między turami.
+    Lokalny fallback (PC/CPU) dokłada rejestr backendów, więc ten łańcuch nie zawiera PC
+    ani darmowych chmur. Gdy model chwilowo niedostępny (400), `RemoteChainBackend` schodzi niżej."""
     keys = load_keys(path)
-    url, model = OPENCODE
+    url, _legacy = OPENCODE
+    sid = opencode_session_id()
+    models = OPENCODE_FREE_MODELS or [_legacy]
     return [Provider("opencode", url, model, key, timeout=config.REMOTE_TIMEOUT,
-                     headers={"x-opencode-session": str(uuid.uuid4())}, account=f"opencode#{i}")
+                     headers={"x-opencode-session": sid}, account=f"opencode#{i}")
+            for model in models
             for i, key in enumerate(keys.get("opencode", []), 1)]
 
 
@@ -283,7 +321,7 @@ def _ensure_opencode_session(provider, headers):
         return
     low = {k.lower() for k in headers}
     if "x-opencode-session" not in low:
-        headers["x-opencode-session"] = str(uuid.uuid4())
+        headers["x-opencode-session"] = opencode_session_id()
 
 
 def _post(provider, payload, path=None):

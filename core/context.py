@@ -3,12 +3,40 @@
 import json
 import time
 
+from .. import config
 from ..persona import compassion as persona_compassion
 from ..persona import current as current_persona
 from ..persona import expression as persona_expression
 from ..persona import persona as persona_mod
 from ..persona import polish as persona_polish
 from ..user import profile as user_profile
+
+
+def premium_intro_block():
+    """Mini-kontekst osobowości dla trybu „premium" (eksperyment 2026-10-03).
+
+    Treść: `runtime/premium_intro.md` (edytowalna bez zmian w kodzie). Wstrzykiwana tuż za
+    SYSTEM_PROMPT — stały prefiks → cache bramki OC Go. Pusta, gdy plik nie istnieje."""
+    try:
+        from ..backends import modes
+        if modes.get_mode() != modes.PREMIUM:
+            return ""
+    except Exception:
+        return ""
+    path = config.RUNTIME_DIR / "premium_intro.md"
+    try:
+        mtime = path.stat().st_mtime
+    except Exception:
+        return ""
+    cache = getattr(premium_intro_block, "_cache", None)
+    if cache and cache[0] == mtime:
+        return cache[1]
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+    except Exception:
+        text = ""
+    premium_intro_block._cache = (mtime, text)
+    return text
 
 STYLE_PROMPT = (
     " STYL MOWY I POLSZCZYZNA: ZAWSZE odpowiadaj po polsku — nawet gdy użytkownik napisze lub "
@@ -84,6 +112,10 @@ def build_context(text, memory=None, max_memories=5, max_lessons=4, max_examples
     # między turami, więc Ollama liczy go tylko raz (cache prefiksu).
     if pinned:
         messages.append({"role": "system", "content": pinned})
+    # Tryb premium: mini-kontekst osobowości wgrany przy starcie (stały prefiks → cache bramki).
+    intro = premium_intro_block()
+    if intro:
+        messages.append({"role": "system", "content": intro})
     extra = [time_line()]
     persona = current_persona()
     extra.append(persona_mod.context_block(persona))
