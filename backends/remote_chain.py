@@ -41,8 +41,10 @@ class RemoteChainBackend(Backend):
 
     def run(self, messages, *, tools=None, fmt=None, max_tokens=400, temperature=0.2,
             on_token=None):
+        # kind do logu zużycia: tools/plan/chat (raporty premium per rodzaj zadania).
+        kind = "tools" if tools else ("plan" if fmt == "json" else "chat")
         result = remote_support.ask_full(messages, tools=tools, fmt=fmt, max_tokens=max_tokens,
-                                         temperature=temperature, chain=self.chain)
+                                         temperature=temperature, chain=self.chain, kind=kind)
         if result is None:
             raise RuntimeError("żaden dostawca zdalny nie odpowiedział")
         text, label, _usage, calls = result

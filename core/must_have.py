@@ -28,8 +28,14 @@ _FEEDBACK_POS_RE = re.compile(
 
 # --- zasoby zdalne (remote_ai) --------------------------------------------------------------
 _REMOTE_RES_RE = re.compile(
-    r"\b(?:zasoby\s+(?:zdalne|remote)|remote\s+zasoby|zuzycie\s+(?:tokenow|remote|ai)|"
+    r"\b(?:zasoby\s+(?:zdalne|remote)|remote\s+zasoby|"
+    r"zuzycie\s+(?:tokenow|remote|ai|tydzien|tygodnia|miesiac|miesiaca)|"
     r"raport\s+remote|stan\s+remote)\b")
+# Raport zużycia premium (monitoring tokenów): „premium zużycie", „premium limity".
+_PREMIUM_USAGE_RE = re.compile(
+    r"\b(?:premium\s+zuzycie|zuzycie\s+premium|premium\s+tokeny|tokeny\s+premium)\b")
+_PREMIUM_LIMITS_RE = re.compile(
+    r"\b(?:premium\s+limity|limity\s+premium|limity\s+tokenow|premium\s+limit)\b")
 
 # --- własne IP ------------------------------------------------------------------------------
 _IP_RE = re.compile(
@@ -297,16 +303,62 @@ def _abort():
     return "Zatrzymuję.", "abort"
 
 
-def _remote_resources():
+def _remote_resources(text=""):
+    """Raport zużycia WSZYSTKICH źródeł zdalnych; słowa „tydzień/miesiąc" zawężają okres."""
+    low = normalize_command(text or "")
     script = os.path.join(str(config.REPO), "scripts", "remote_usage.py")
-    code, tree = _run([sys.executable, script, "--all", "--no-color"], timeout=60)
-    _code2, summary = _run([sys.executable, script, "--all", "--summary"], timeout=60)
+    extra = []
+    if any(w in low for w in ("tydzien", "tygodnia", "tygodni")):
+        extra = ["--days", "7"]
+    elif any(w in low for w in ("miesiac", "miesiaca", "miesieczn")):
+        extra = ["--days", "30"]
+    else:
+        extra = ["--all"]
+    code, tree = _run([sys.executable, script, *extra, "--no-color"], timeout=60)
+    _code2, summary = _run([sys.executable, script, *extra, "--summary"], timeout=60)
     if tree:
         try:
             mirror.wall_write(tree)
         except Exception:
             pass
     return (summary or "Brak danych o zużyciu zdalnych modeli."), "remote-usage"
+
+
+def _premium_usage(text=""):
+    """Raport zużycia premium (OpenCode Go): per model, rodzaje zadań, koszt. Bez modelu."""
+    low = normalize_command(text or "")
+    days = "1"
+    if any(w in low for w in ("tydzien", "tygodnia", "tygodni")):
+        days = "7"
+    elif any(w in low for w in ("miesiac", "miesiaca", "miesieczn")):
+        days = "30"
+    script = os.path.join(str(config.REPO), "scripts", "remote_usage.py")
+    _code, out = _run([sys.executable, script, "--premium", "--summary", "--no-color",
+                       "--days", days], timeout=60)
+    return ((out or "").strip() or "Brak danych o zużyciu premium."), "premium-usage"
+
+
+def _premium_limits():
+    """Limity premium i dzisiejsze wykorzystanie budżetu (bez modelu)."""
+    from .. import config as _config
+    from ..backends import modes
+    try:
+        tok, req = modes.premium_spend_today()
+    except Exception:
+        tok, req = 0, 0
+    cap_t = int(getattr(_config, "PREMIUM_DAILY_TOKENS", 0) or 0)
+    cap_r = int(getattr(_config, "PREMIUM_DAILY_REQUESTS", 0) or 0)
+    parts = [f"Dziś premium: {tok} tokenów, {req} wywołań"]
+    if cap_t > 0:
+        parts.append(f"bezpiecznik dzienny: {min(100, int(100 * tok / cap_t))} procent "
+                     f"z {cap_t} tokenów")
+    else:
+        parts.append("bezpiecznik tokenów: wyłączony")
+    if cap_r > 0:
+        parts.append(f"limit wywołań: {min(100, int(100 * req / cap_r))} procent "
+                     f"z {cap_r}")
+    parts.append("modele darmowe: bez limitu")
+    return (". ".join(parts) + ".", "premium-limits")
 
 
 def _own_ip():
@@ -608,6 +660,12 @@ def intent(text):
         return ""
     if _ABORT_RE.match(low):
         return "abort"
+    # Premium-* PRZED remote-usage (2026-10-03): „premium zużycie tydzień" nie może wpadać
+    # w ogólną trasę „zużycie tydzień" (kolizja wzorców).
+    if _PREMIUM_LIMITS_RE.search(low):
+        return "premium-limits"
+    if _PREMIUM_USAGE_RE.search(low):
+        return "premium-usage"
     if _REMOTE_RES_RE.search(low):
         return "remote-usage"
     if _IP_RE.match(low):
@@ -708,7 +766,7 @@ def handle(text, agent=None):
             return None
         return _abort()
     if route == "remote-usage":
-        return _remote_resources()
+        return _remote_resources(text)
     if route == "ip":
         return _own_ip()
     if route == "feedback-neg":
@@ -732,6 +790,10 @@ def handle(text, agent=None):
         return _mode_status()
     if route == "premium-status":
         return _premium_status()
+    if route == "premium-usage":
+        return _premium_usage(text)
+    if route == "premium-limits":
+        return _premium_limits()
     if route == "watch-off":
         from ..vision import privacy
         privacy.set_watch_off(True)

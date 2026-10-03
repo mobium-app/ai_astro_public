@@ -93,6 +93,37 @@ OPENCODE_FREE_MODELS = [m.strip() for m in os.environ.get(
     "space-bunny-free,longcat-2.5-preview-free,mimo-v2.6-flash-free",
 ).split(",") if m.strip()]
 
+# Cennik modeli OC Go (USD za 1M tokenów; źródło: docs opencode.ai/go, 2026-10-03).
+# Modele free = 0. Wartości płatnych: konserwatywnie (DeepSeek peak); cache pomijany (mały wpływ).
+GO_PRICES = {
+    "deepseek-v4.1-flash": (0.30, 1.20), "deepseek-v4-flash": (0.30, 1.20),
+    "deepseek-v4-pro": (1.32, 3.96), "deepseek-v4-flash-vision-exp": (0.30, 1.20),
+    "mimo-v2.6-flash": (0.14, 0.28), "mimo-v2.6-pro": (0.435, 0.87),
+    "mimo-v2.5": (0.14, 0.28), "mimo-v2.5-pro": (0.435, 0.87),
+    "glm-5.3": (1.40, 4.40), "glm-5.3-flash": (0.15, 0.50), "glm-5.2": (1.40, 4.40),
+    "kimi-k3": (3.00, 15.00), "kimi-k2.7-code": (0.95, 4.00), "kimi-k2.6": (0.95, 4.00),
+    "longcat-2.0": (0.30, 1.20), "minimax-m3": (0.30, 1.20), "minimax-m2.7": (0.30, 1.20),
+    "qwen3.8-max": (2.00, 6.00), "qwen3.8-flash": (0.15, 0.47), "qwen3.7-plus": (0.40, 1.60),
+    "grok-4.7": (2.00, 6.00), "grok-4.6": (2.00, 6.00),
+    "gpt-6-luna": (0.10, 0.50), "gpt-5.6-luna": (0.20, 1.20),
+    "hy3": (0.14, 0.58), "hy4-preview": (0.834, 2.501),
+    "muse-spark-1.3-contributor": (0.10, 0.20), "muse-spark-1.2-contributor": (0.10, 0.20),
+}
+# Modele darmowe OC Go (unlimited, limited-time) — koszt 0.
+FREE_MODELS = set(OPENCODE_FREE_MODELS) | {"space-bunny-free", "longcat-2.5-preview-free"}
+
+
+def is_free_model(model):
+    return (model in FREE_MODELS) or ("-free" in (model or ""))
+
+
+def estimate_usd(model, prompt_tokens, completion_tokens):
+    """Szacunkowy koszt USD (0 dla free/nieznanych jako free-nie; patrz GO_PRICES)."""
+    if is_free_model(model):
+        return 0.0
+    pin, pout = GO_PRICES.get(model, (0.0, 0.0))
+    return round(pin * prompt_tokens / 1e6 + pout * completion_tokens / 1e6, 6)
+
 
 def opencode_session_id():
     """Stały identyfikator sesji OpenCode (utrwalony) — kontekst bez zrywania między turami.
@@ -366,14 +397,17 @@ def _get(url, key="", timeout=10):
         raise RuntimeError(str(e))
 
 
-def _log_usage(provider, usage):
+def _log_usage(provider, usage, kind=""):
+    """Zapis zużycia (rozszerzony 2026-10-03): kind/free/est_usd dla raportów premium."""
     try:
         config.ensure_dirs()
+        prompt = int((usage or {}).get("prompt_tokens") or 0)
+        completion = int((usage or {}).get("completion_tokens") or 0)
         entry = {"ts": time.time(), "provider": provider.label, "account": provider.name(),
-                 "model": provider.model,
-                 "prompt": int((usage or {}).get("prompt_tokens") or 0),
-                 "completion": int((usage or {}).get("completion_tokens") or 0),
-                 "total": int((usage or {}).get("total_tokens") or 0)}
+                 "model": provider.model, "prompt": prompt, "completion": completion,
+                 "total": int((usage or {}).get("total_tokens") or 0),
+                 "kind": kind or "", "free": is_free_model(provider.model),
+                 "est_usd": estimate_usd(provider.model, prompt, completion)}
         with open(config.LOGS_DIR / "remote_usage.jsonl", "a", encoding="utf-8") as fh:
             fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
     except Exception:
@@ -381,14 +415,14 @@ def _log_usage(provider, usage):
 
 
 def ask(messages, *, tools=None, fmt=None, temperature=0.2, max_tokens=600, timeout=None,
-        chain=None, errors_out=None):
+        chain=None, errors_out=None, kind=""):
     """Próbuje dostawców po kolei. Zwraca (text, label, usage) albo None gdy nikt nie odpowie.
 
     `errors_out` (opcjonalna lista) zbiera komunikaty błędów dostawców — do wykrywania
-    wyczerpania limitów (429/402/quota) bez logowania kluczy.
+    wyczerpania limitów (429/402/quota) bez logowania kluczy. `kind` trafia do logu zużycia.
     """
     res = ask_full(messages, tools=tools, fmt=fmt, temperature=temperature, max_tokens=max_tokens,
-                   timeout=timeout, chain=chain, errors_out=errors_out)
+                   timeout=timeout, chain=chain, errors_out=errors_out, kind=kind)
     if res is None:
         return None
     text, label, usage, _calls = res
@@ -396,7 +430,7 @@ def ask(messages, *, tools=None, fmt=None, temperature=0.2, max_tokens=600, time
 
 
 def ask_full(messages, *, tools=None, fmt=None, temperature=0.2, max_tokens=600, timeout=None,
-             chain=None, errors_out=None):
+             chain=None, errors_out=None, kind=""):
     """Jak `ask`, ale zwraca też `tool_calls`: (text, label, usage, tool_calls) albo None.
 
     Sukcesem jest również odpowiedź z samymi wywołaniami narzędzi (puste `content`) — bez tego
@@ -440,7 +474,7 @@ def ask_full(messages, *, tools=None, fmt=None, temperature=0.2, max_tokens=600,
         text = (msg.get("content") or "").strip()
         calls = msg.get("tool_calls") or []
         if text or calls:
-            _log_usage(provider, data.get("usage"))
+            _log_usage(provider, data.get("usage"), kind=kind)
             return text, provider.label, data.get("usage") or {}, calls
         errors.append(f"{provider.name()}: pusta odpowiedź")
     if errors_out is not None:

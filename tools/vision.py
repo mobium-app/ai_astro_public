@@ -212,7 +212,7 @@ def _vlm_caption_premium(frame_path, question=""):
             {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}},
         ]}]
         res = remote_support.ask_full(messages, max_tokens=500, temperature=0.1,
-                                      chain=remote_support.opencode_chain())
+                                      chain=remote_support.opencode_chain(), kind="vision")
         if not res:
             return ""
         text = (res[0] or "").strip()
